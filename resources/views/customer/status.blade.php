@@ -4,7 +4,9 @@
 
 @section('content')
     <header class="customer-header" style="text-align: center; padding-bottom: 20px;">
-        <div style="font-size: 2rem; margin-bottom: 4px;">📋</div>
+        <div style="width: 52px; height: 52px; background: rgba(212, 163, 115, 0.2); border: 1.5px solid var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; color: var(--accent);">
+            <svg class="svg-icon svg-icon-xl" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </div>
         <h1 style="font-size: 1.3rem; font-weight: 800;">Status Pesanan Anda</h1>
         <p style="font-size: 0.8rem; color: var(--accent);">Order #{{ $order->order_number }} • Meja {{ $order->table->table_number }}</p>
     </header>
@@ -71,8 +73,9 @@
             </div>
 
             @if($order->payment_method === 'cash' && $order->payment_status === 'UNPAID')
-                <div style="margin-top: 16px; padding: 12px; background: var(--warning-bg); border-radius: var(--radius-sm); font-size: 0.82rem; color: var(--warning); text-align: center;">
-                    💡 <strong>Instruksi:</strong> Silakan mendatangi Kasir dan bayar tunai sejumlah <strong>Rp{{ number_format($order->total_amount, 0, ',', '.') }}</strong> agar pesanan langsung diproses dapur.
+                <div style="margin-top: 16px; padding: 12px; background: var(--warning-bg); border-radius: var(--radius-sm); font-size: 0.82rem; color: var(--warning); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span><strong>Instruksi:</strong> Silakan mendatangi Kasir dan bayar tunai sejumlah <strong>Rp{{ number_format($order->total_amount, 0, ',', '.') }}</strong> agar pesanan langsung diproses dapur.</span>
                 </div>
             @endif
         </div>
@@ -103,8 +106,9 @@
             </div>
         </div>
 
-        <a href="{{ route('customer.menu', ['table' => $order->table->table_number]) }}" class="btn btn-outline btn-block">
-            ➕ Tambah Pesanan Lain
+        <a href="{{ route('customer.menu', ['table' => $order->table->table_number]) }}" class="btn btn-outline btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Tambah Pesanan Lain</span>
         </a>
     </div>
 @endsection

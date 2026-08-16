@@ -7,14 +7,17 @@
     <header class="customer-header">
         <div class="brand-row">
             <div class="brand-logo">
-                <div class="brand-icon">☕</div>
+                <div class="brand-icon">
+                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
+                </div>
                 <div>
                     <div class="brand-title">KAFE DIGITAL</div>
                     <div class="brand-subtitle">Self-Ordering System</div>
                 </div>
             </div>
             <div class="table-pill">
-                <span>🪑</span> Meja {{ $table->table_number }}
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                <span>Meja {{ $table->table_number }}</span>
             </div>
         </div>
     </header>
@@ -78,8 +81,9 @@
             <span class="cart-count" id="cartCountText">0 Item dipilih</span>
             <span class="cart-total" id="cartTotalText">Rp0</span>
         </div>
-        <button type="button" class="btn btn-accent btn-sm">
-            Lihat Keranjang 🛒
+        <button type="button" class="btn btn-accent btn-sm" style="display: flex; align-items: center; gap: 6px;">
+            <span>Lihat Keranjang</span>
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
         </button>
     </div>
 
@@ -131,21 +135,26 @@
                 <div class="payment-options">
                     <label class="payment-card active" id="payCardCash" onclick="selectPayment('cash')">
                         <input type="radio" name="payment_method" value="cash" checked>
-                        <div class="payment-card-icon">💵</div>
+                        <div class="payment-card-icon">
+                            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        </div>
                         <div class="payment-card-title">CASH</div>
                         <div style="font-size: 0.72rem; color: var(--text-muted);">Bayar di Kasir</div>
                     </label>
                     <label class="payment-card" id="payCardQris" onclick="selectPayment('qris')">
                         <input type="radio" name="payment_method" value="qris">
-                        <div class="payment-card-icon">📱</div>
+                        <div class="payment-card-icon">
+                            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        </div>
                         <div class="payment-card-title">QRIS</div>
                         <div style="font-size: 0.72rem; color: var(--text-muted);">Bayar Instant</div>
                     </label>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block" style="padding: 14px; font-size: 1.05rem; margin-top: 10px;">
-                Konfirmasi & Buat Pesanan 🚀
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 14px; font-size: 1.05rem; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>Konfirmasi & Buat Pesanan</span>
+                <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </button>
         </form>
     </div>

@@ -46,6 +46,8 @@ Route::middleware(['auth', 'role:kasir,admin'])->prefix('cashier')->name('cashie
     Route::post('/orders/{id}/confirm-payment', [CashierController::class, 'confirmPayment'])->name('orders.confirm-payment');
     Route::post('/orders/{id}/send-kitchen', [CashierController::class, 'sendToKitchen'])->name('orders.send-kitchen');
     Route::post('/orders/{id}/cancel', [CashierController::class, 'cancelOrder'])->name('orders.cancel');
+    Route::delete('/orders/{id}', [CashierController::class, 'destroy'])->name('orders.destroy');
+    Route::post('/orders/clear-completed', [CashierController::class, 'clearCompleted'])->name('orders.clear-completed');
 });
 
 /*

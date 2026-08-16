@@ -4,7 +4,9 @@
 
 @section('content')
     <header class="customer-header" style="text-align: center; padding-bottom: 24px;">
-        <div style="font-size: 2.2rem; margin-bottom: 4px;">📱</div>
+        <div style="width: 52px; height: 52px; background: rgba(212, 163, 115, 0.2); border: 1.5px solid var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; color: var(--accent);">
+            <svg class="svg-icon svg-icon-xl" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+        </div>
         <h1 style="font-size: 1.3rem; font-weight: 800;">Pembayaran QRIS</h1>
         <p style="font-size: 0.8rem; color: var(--accent);">Meja {{ $order->table->table_number }} • {{ $order->customer_name }}</p>
     </header>
@@ -51,16 +53,18 @@
 
         <!-- Simulation Payment Button (As requested in Requirement #8 & #16) -->
         <div style="background: #fff4e5; border: 1px dashed #ed6c02; border-radius: var(--radius-md); padding: 16px; text-align: center;">
-            <div style="font-size: 0.8rem; font-weight: 700; color: #ed6c02; margin-bottom: 8px;">
-                ⚠️ SIMULASI GATEWAY PEMBAYARAN QRIS
+            <div style="font-size: 0.8rem; font-weight: 700; color: #ed6c02; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>SIMULASI GATEWAY PEMBAYARAN QRIS</span>
             </div>
             <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
                 Klik tombol di bawah ini untuk mensimulasikan notifikasi callback pembayaran berhasil dari gateway QRIS.
             </p>
             <form action="{{ route('customer.payment.simulate', ['order_number' => $order->order_number]) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn btn-accent btn-block" style="padding: 12px; font-size: 0.95rem;">
-                    Simulasikan Pembayaran Berhasil ✅
+                <button type="submit" class="btn btn-accent btn-block" style="padding: 12px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>Simulasikan Pembayaran Berhasil</span>
+                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                 </button>
             </form>
         </div>

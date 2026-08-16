@@ -107,4 +107,24 @@ class CashierController extends Controller
 
         return back()->with('success', "Order #{$order->order_number} telah dibatalkan.");
     }
+
+    public function destroy($id)
+    {
+        $order = Order::findOrFail($id);
+        $orderNumber = $order->order_number;
+        $order->delete();
+
+        return back()->with('success', "Order #{$orderNumber} berhasil dihapus permanen.");
+    }
+
+    public function clearCompleted()
+    {
+        $count = Order::whereIn('order_status', ['COMPLETED', 'CANCELLED'])->delete();
+
+        if ($count === 0) {
+            return back()->with('info', 'Tidak ada pesanan lama (Selesai/Batal) untuk dibersihkan.');
+        }
+
+        return back()->with('success', "Berhasil menghapus {$count} pesanan lama (Selesai/Batal).");
+    }
 }

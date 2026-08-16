@@ -745,3 +745,296 @@ a {
 
 .item-qty-name { font-weight: 700; font-size: 1.05rem; }
 .item-notes { font-size: 0.8rem; color: var(--danger); font-style: italic; margin-top: 2px; }
+
+/* MODERN CASHIER DASHBOARD & 3-DOTS MENU STYLES */
+.cashier-filter-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: #ffffff;
+    border: 1.5px solid var(--border-color);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(30, 20, 14, 0.02);
+}
+
+.filter-pill:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.filter-pill.active {
+    background: linear-gradient(135deg, #4a3427 0%, #3c2a21 100%);
+    color: #ffffff;
+    border-color: #3c2a21;
+    box-shadow: 0 4px 14px rgba(60, 42, 33, 0.25);
+}
+
+.filter-pill .pill-badge {
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.filter-pill.active .pill-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+/* 3-Dots Kebab Action Menu */
+.action-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-dots {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1.5px solid var(--border-color);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.btn-dots:hover, .btn-dots.active {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(60, 42, 33, 0.2);
+}
+
+.action-dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    width: 220px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 12px 32px rgba(30, 20, 14, 0.15);
+    padding: 8px;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px) scale(0.96);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+.action-dropdown.open .action-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.action-dropdown-header {
+    padding: 6px 10px 8px 10px;
+    font-size: 0.725rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 6px;
+}
+
+.action-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    background: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    text-decoration: none;
+}
+
+.action-dropdown-item:hover {
+    background: #faf5f0;
+    color: var(--primary);
+    transform: translateX(2px);
+}
+
+.action-dropdown-item.item-success:hover {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.action-dropdown-item.item-danger:hover {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.action-dropdown-item.item-primary:hover {
+    background: var(--accent-light);
+    color: var(--primary);
+}
+
+.action-dropdown-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Modernized Order Table Details */
+.cashier-table-wrapper {
+    position: relative;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    box-shadow: var(--shadow-sm);
+}
+
+.table-responsive.has-dropdown {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+.order-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.order-item-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.order-item-qty {
+    background: var(--accent-light);
+    color: var(--primary);
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    border: 1px solid rgba(212, 163, 115, 0.3);
+}
+
+.order-item-note {
+    display: inline-block;
+    font-size: 0.78rem;
+    color: var(--danger);
+    background: var(--danger-bg);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-style: italic;
+    margin-left: 4px;
+}
+
+/* CUSTOM PAGINATION STYLES & SVG BUG FIX */
+.custom-pagination,
+nav[role="navigation"] {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: #ffffff;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-xs);
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+nav[role="navigation"] svg {
+    width: 1rem !important;
+    height: 1rem !important;
+    max-width: 1rem !important;
+    max-height: 1rem !important;
+    min-width: 1rem !important;
+    min-height: 1rem !important;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.pagination-info {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.pagination-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    font-size: 0.825rem;
+    font-weight: 700;
+    border-radius: var(--radius-xs);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.pagination-btn:hover:not(.disabled):not(.active) {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--primary);
+}
+
+.pagination-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+}
+
+.pagination-btn.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f7f3ee;
+}
+
+
