@@ -140,4 +140,165 @@ class OrderSystemTest extends TestCase
         $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
         $this->assertTrue(str_contains($response->headers->get('Content-Disposition'), 'Laporan_Penjualan_Cafe'));
     }
+
+    public function test_cashier_can_access_pos_screen(): void
+    {
+        $cashier = User::create([
+            'name' => 'Kasir POS',
+            'email' => 'pos@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'kasir',
+        ]);
+
+        $response = $this->actingAs($cashier)->get(route('cashier.pos'));
+        $response->assertStatus(200);
+        $response->assertSee('Kasir POS Terminal');
+        $response->assertSee('Es Kopi Susu');
+    }
+
+    public function test_cashier_can_checkout_direct_pos_order_with_cash(): void
+    {
+        $cashier = User::create([
+            'name' => 'Kasir POS 2',
+            'email' => 'pos2@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'kasir',
+        ]);
+
+        $cartItems = [
+            [
+                'id' => $this->product->id,
+                'name' => $this->product->name,
+                'qty' => 3,
+                'notes' => 'Less sugar',
+            ]
+        ];
+
+        $response = $this->actingAs($cashier)->postJson(route('cashier.pos.checkout'), [
+            'customer_name' => 'Doni Walk-in',
+            'order_type' => 'dine_in',
+            'table_id' => $this->table->id,
+            'cart_items' => $cartItems,
+            'payment_method' => 'cash',
+            'cash_received' => 50000,
+            'order_action' => 'send_kitchen',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'customer_name' => 'Doni Walk-in',
+            'total_amount' => 45000, // 15000 * 3 = 45000
+            'payment_method' => 'cash',
+            'payment_status' => 'PAID',
+            'order_status' => 'WAITING_KITCHEN',
+        ]);
+
+        $order = Order::where('customer_name', 'Doni Walk-in')->first();
+        $this->assertNotNull($order->payment);
+        $this->assertEquals(50000, $order->payment->payload['cash_received']);
+        $this->assertEquals(5000, $order->payment->payload['cash_change']);
+    }
+
+    public function test_cashier_can_checkout_takeaway_order_without_table(): void
+    {
+        $cashier = User::create([
+            'name' => 'Kasir Takeaway',
+            'email' => 'takeaway@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'kasir',
+        ]);
+
+        $cartItems = [
+            [
+                'id' => $this->product->id,
+                'name' => $this->product->name,
+                'qty' => 1,
+            ]
+        ];
+
+        $response = $this->actingAs($cashier)->postJson(route('cashier.pos.checkout'), [
+            'customer_name' => 'Siti Bungkus',
+            'order_type' => 'takeaway',
+            'table_id' => null,
+            'cart_items' => $cartItems,
+            'payment_method' => 'qris',
+            'order_action' => 'direct_complete',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('orders', [
+            'customer_name' => 'Siti Bungkus',
+            'table_id' => null,
+            'payment_method' => 'qris',
+            'payment_status' => 'PAID',
+            'order_status' => 'COMPLETED',
+        ]);
+    }
+
+    public function test_cashier_can_confirm_cash_payment_with_change_for_qr_order(): void
+    {
+        $cashier = User::create([
+            'name' => 'Kasir Confirm',
+            'email' => 'confirm@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'kasir',
+        ]);
+
+        $order = Order::create([
+            'order_number' => 'ORD-20260814-0099',
+            'table_id' => $this->table->id,
+            'customer_name' => 'Andi QR',
+            'total_amount' => 30000,
+            'payment_method' => 'cash',
+            'payment_status' => 'UNPAID',
+            'order_status' => 'PENDING',
+        ]);
+
+        $response = $this->actingAs($cashier)->postJson(route('cashier.orders.confirm-cash', $order->id), [
+            'cash_received' => 50000,
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'cash_received' => 50000,
+            'cash_change' => 20000,
+        ]);
+
+        $this->assertDatabaseHas('orders', [
+            'id' => $order->id,
+            'payment_status' => 'PAID',
+        ]);
+    }
+
+    public function test_cashier_can_view_receipt(): void
+    {
+        $cashier = User::create([
+            'name' => 'Kasir Receipt',
+            'email' => 'receipt@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'kasir',
+        ]);
+
+        $order = Order::create([
+            'order_number' => 'ORD-20260814-0100',
+            'table_id' => $this->table->id,
+            'customer_name' => 'Rina',
+            'total_amount' => 15000,
+            'payment_method' => 'cash',
+            'payment_status' => 'PAID',
+            'order_status' => 'WAITING_KITCHEN',
+        ]);
+
+        $response = $this->actingAs($cashier)->get(route('cashier.orders.receipt', $order->id));
+        $response->assertStatus(200);
+        $response->assertSee('CAFE SELF-ORDERING');
+        $response->assertSee('ORD-20260814-0100');
+    }
 }

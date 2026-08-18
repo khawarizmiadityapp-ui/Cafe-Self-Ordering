@@ -8,7 +8,7 @@
             <svg class="svg-icon svg-icon-xl" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
         </div>
         <h1 style="font-size: 1.3rem; font-weight: 800;">Pembayaran QRIS</h1>
-        <p style="font-size: 0.8rem; color: var(--accent);">Meja {{ $order->table->table_number }} • {{ $order->customer_name }}</p>
+        <p style="font-size: 0.8rem; color: var(--accent);">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }} • {{ $order->customer_name }}</p>
     </header>
 
     <div style="padding: 20px 16px;">

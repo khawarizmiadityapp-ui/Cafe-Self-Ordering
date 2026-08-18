@@ -42,4 +42,18 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public function isTakeaway(): bool
+    {
+        return empty($this->table_id);
+    }
+
+    public function getTableDisplayNameAttribute(): string
+    {
+        if ($this->table) {
+            return 'Meja ' . $this->table->table_number;
+        }
+
+        return 'Takeaway / Bungkus';
+    }
 }

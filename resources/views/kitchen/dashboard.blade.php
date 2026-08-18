@@ -27,7 +27,7 @@
             <div class="kitchen-card {{ $order->order_status === 'PROCESSING' ? 'processing' : '' }}">
                 <div class="kitchen-header">
                     <div>
-                        <div class="kitchen-table-num">MEJA {{ $order->table->table_number }}</div>
+                        <div class="kitchen-table-num">{{ $order->table ? 'MEJA ' . $order->table->table_number : 'TAKEAWAY (BUNGKUS)' }}</div>
                         <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
                             {{ $order->customer_name }} • {{ $order->order_number }}
                         </div>

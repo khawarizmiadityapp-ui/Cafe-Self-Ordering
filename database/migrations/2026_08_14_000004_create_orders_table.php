@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number')->unique(); // e.g. "ORD-20260814-0001"
-            $table->foreignId('table_id')->constrained('tables')->onDelete('cascade');
+            $table->foreignId('table_id')->nullable()->constrained('tables')->nullOnDelete();
             $table->string('customer_name');
             $table->decimal('total_amount', 12, 2);
-            $table->enum('payment_method', ['cash', 'qris'])->default('cash');
+            $table->string('payment_method')->default('cash'); // cash, qris, debit
             $table->enum('payment_status', ['UNPAID', 'PAID', 'FAILED', 'REFUNDED'])->default('UNPAID');
             $table->enum('order_status', ['PENDING', 'WAITING_KITCHEN', 'PROCESSING', 'READY', 'COMPLETED', 'CANCELLED'])->default('PENDING');
             $table->timestamp('paid_at')->nullable();

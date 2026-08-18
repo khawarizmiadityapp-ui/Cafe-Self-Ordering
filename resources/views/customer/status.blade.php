@@ -8,7 +8,7 @@
             <svg class="svg-icon svg-icon-xl" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         </div>
         <h1 style="font-size: 1.3rem; font-weight: 800;">Status Pesanan Anda</h1>
-        <p style="font-size: 0.8rem; color: var(--accent);">Order #{{ $order->order_number }} • Meja {{ $order->table->table_number }}</p>
+        <p style="font-size: 0.8rem; color: var(--accent);">Order #{{ $order->order_number }} • {{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }}</p>
     </header>
 
     <div style="padding: 20px 16px;">
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <a href="{{ route('customer.menu', ['table' => $order->table->table_number]) }}" class="btn btn-outline btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <a href="{{ route('customer.menu', ['table' => $order->table ? $order->table->table_number : '01']) }}" class="btn btn-outline btn-block" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
             <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             <span>Tambah Pesanan Lain</span>
         </a>

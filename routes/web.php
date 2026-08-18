@@ -43,7 +43,11 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 */
 Route::middleware(['auth', 'role:kasir,admin'])->prefix('cashier')->name('cashier.')->group(function () {
     Route::get('/dashboard', [CashierController::class, 'dashboard'])->name('dashboard');
+    Route::get('/pos', [CashierController::class, 'pos'])->name('pos');
+    Route::post('/pos/checkout', [CashierController::class, 'posCheckout'])->name('pos.checkout');
+    Route::get('/orders/{id}/receipt', [CashierController::class, 'getReceipt'])->name('orders.receipt');
     Route::post('/orders/{id}/confirm-payment', [CashierController::class, 'confirmPayment'])->name('orders.confirm-payment');
+    Route::post('/orders/{id}/confirm-cash', [CashierController::class, 'confirmCashWithChange'])->name('orders.confirm-cash');
     Route::post('/orders/{id}/send-kitchen', [CashierController::class, 'sendToKitchen'])->name('orders.send-kitchen');
     Route::post('/orders/{id}/cancel', [CashierController::class, 'cancelOrder'])->name('orders.cancel');
     Route::delete('/orders/{id}', [CashierController::class, 'destroy'])->name('orders.destroy');

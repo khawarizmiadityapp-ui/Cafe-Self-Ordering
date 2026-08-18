@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3c2a21"/>
+      <stop offset="50%" stop-color="#2a1c14"/>
+      <stop offset="100%" stop-color="#1e140e"/>
+    </linearGradient>
+    <linearGradient id="cupGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4a373"/>
+      <stop offset="100%" stop-color="#b88252"/>
+    </linearGradient>
+    <linearGradient id="steamGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle decorative circles -->
+  <circle cx="200" cy="150" r="90" fill="none" stroke="#d4a373" stroke-width="1.5" stroke-opacity="0.2" stroke-dasharray="4 4"/>
+  <circle cx="200" cy="150" r="115" fill="none" stroke="#d4a373" stroke-width="1" stroke-opacity="0.1"/>
+  
+  <!-- Steam lines -->
+  <path d="M 185 105 Q 180 85 188 70 T 184 50" fill="none" stroke="url(#steamGrad)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 200 100 Q 195 80 203 65 T 199 45" fill="none" stroke="url(#steamGrad)" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 215 105 Q 210 85 218 70 T 214 50" fill="none" stroke="url(#steamGrad)" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Coffee Saucer / Plate -->
+  <ellipse cx="200" cy="205" rx="55" ry="10" fill="#241710" stroke="#d4a373" stroke-width="2" stroke-opacity="0.4"/>
+  
+  <!-- Coffee Cup Body -->
+  <path d="M 160 125 L 168 190 Q 200 202 232 190 L 240 125 Z" fill="url(#cupGrad)"/>
+  
+  <!-- Cup Handle -->
+  <path d="M 236 135 C 260 135 260 175 233 175" fill="none" stroke="url(#cupGrad)" stroke-width="6" stroke-linecap="round"/>
+  
+  <!-- Coffee Liquid in Cup -->
+  <ellipse cx="200" cy="125" rx="40" ry="10" fill="#24160e" stroke="#e6ded6" stroke-width="2"/>
+  <ellipse cx="200" cy="125" rx="34" ry="7" fill="#4a2e1b"/>
+  <ellipse cx="198" cy="125" rx="20" ry="4" fill="#c28b58" opacity="0.7"/>
+
+  <!-- Logo/Icon on cup -->
+  <path d="M 194 150 L 206 150 M 200 144 L 200 156" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Text banner -->
+  <text x="200" y="245" font-family="'Outfit', sans-serif" font-size="14" font-weight="700" fill="#d4a373" text-anchor="middle" letter-spacing="1.5">CAFE SPECIAL MENU</text>
+</svg>

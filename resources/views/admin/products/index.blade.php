@@ -41,7 +41,7 @@
                 @forelse($products as $product)
                     <tr>
                         <td>
-                            <img src="{{ $product->image ?: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=100' }}" alt="{{ $product->name }}" style="width: 54px; height: 54px; border-radius: 10px; object-fit: cover;">
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="width: 54px; height: 54px; border-radius: 10px; object-fit: cover;" onerror="this.onerror=null; this.src='{{ asset('images/coffee-default.svg') }}'">
                         </td>
                         <td style="font-weight: 700;">
                             <div style="color: var(--text-dark); font-size: 0.98rem;">{{ $product->name }}</div>

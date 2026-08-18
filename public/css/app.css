@@ -1037,4 +1037,126 @@ nav[role="navigation"] svg {
     background: #f7f3ee;
 }
 
+/* STAFF PORTAL TOP NAVBAR */
+.staff-navbar {
+    background: var(--sidebar-bg);
+    border-bottom: 1px solid var(--border-dark);
+    color: #ffffff;
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+    flex-wrap: wrap;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.staff-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.staff-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.staff-nav-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #d4a373 0%, #b88252 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(212, 163, 115, 0.35);
+}
+
+.staff-nav-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+}
+
+.staff-nav-subtitle {
+    font-size: 0.725rem;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.staff-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-portal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav-portal-btn:hover {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.nav-portal-btn.active {
+    background: linear-gradient(135deg, #d4a373 0%, #b88252 100%);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(212, 163, 115, 0.35);
+}
+
+.nav-portal-btn.active-kitchen {
+    background: linear-gradient(135deg, #ed6c02 0%, #c75600 100%);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(237, 108, 2, 0.35);
+}
+
+.staff-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.staff-user-info {
+    text-align: right;
+}
+
+.staff-user-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #ffffff;
+}
+
+.staff-user-role {
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+
 

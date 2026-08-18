@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Kasir - Cafe Self-Ordering System')
 
 @section('content')
-    <div class="page-header" style="margin-bottom: 24px;">
+    <div class="page-header" style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 14px;">
             <div style="width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 14px rgba(212, 163, 115, 0.35);">
                 <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
@@ -12,6 +12,13 @@
                 <h1 class="page-title" style="font-size: 1.6rem; margin-bottom: 2px;">Dashboard Kasir</h1>
                 <p style="font-size: 0.875rem; color: var(--text-muted);">Kelola konfirmasi pembayaran tunai & pengiriman pesanan ke dapur</p>
             </div>
+        </div>
+
+        <div>
+            <a href="{{ route('cashier.pos') }}" class="btn btn-accent" style="padding: 12px 22px; font-weight: 800; font-size: 0.95rem; border-radius: 12px; box-shadow: 0 4px 16px rgba(212, 163, 115, 0.35);">
+                <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                <span>BUKA KASIR POS</span>
+            </a>
         </div>
     </div>
 
@@ -109,7 +116,7 @@
             <thead>
                 <tr>
                     <th style="width: 130px;">Order #</th>
-                    <th style="width: 100px;">Meja</th>
+                    <th style="width: 110px;">Meja / Tipe</th>
                     <th style="width: 140px;">Pelanggan</th>
                     <th>Detail Pesanan</th>
                     <th style="width: 130px;">Total</th>
@@ -132,9 +139,15 @@
                             </div>
                         </td>
                         <td>
-                            <span style="font-weight: 800; background: var(--accent-light); color: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 0.85rem; border: 1px solid rgba(212,163,115,0.3);">
-                                Meja {{ $order->table->table_number }}
-                            </span>
+                            @if($order->table)
+                                <span style="font-weight: 800; background: var(--accent-light); color: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 0.85rem; border: 1px solid rgba(212,163,115,0.3);">
+                                    Meja {{ $order->table->table_number }}
+                                </span>
+                            @else
+                                <span style="font-weight: 800; background: #f3e5f5; color: #7b1fa2; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; border: 1px solid #e1bee7;">
+                                    Takeaway
+                                </span>
+                            @endif
                         </td>
                         <td style="font-weight: 600; color: var(--text-dark);">
                             {{ $order->customer_name }}
@@ -197,14 +210,25 @@
                                     <div class="action-dropdown-header">Aksi Order #{{ $order->order_number }}</div>
 
                                     @if($order->payment_status === 'UNPAID' && $order->order_status !== 'CANCELLED')
+                                        <button type="button" class="action-dropdown-item item-success" onclick="openCashPaymentModal({{ $order->id }}, '{{ $order->order_number }}', {{ $order->total_amount }}, '{{ addslashes($order->customer_name) }}')">
+                                            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                            <span>Bayar Tunai di Kasir</span>
+                                        </button>
+
                                         <form action="{{ route('cashier.orders.confirm-payment', $order->id) }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="action-dropdown-item item-success">
-                                                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                                                <span>Konfirmasi Bayar (PAID)</span>
+                                            <button type="submit" class="action-dropdown-item">
+                                                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                <span>Quick Confirm (LUNAS)</span>
                                             </button>
                                         </form>
                                     @endif
+
+                                    <!-- Print Receipt Button -->
+                                    <button type="button" class="action-dropdown-item item-primary" onclick="printReceipt({{ $order->id }})">
+                                        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                        <span>Cetak Struk / Nota</span>
+                                    </button>
 
                                     @if($order->payment_status === 'PAID' && $order->order_status === 'PENDING')
                                         <form action="{{ route('cashier.orders.send-kitchen', $order->id) }}" method="POST">
@@ -257,6 +281,67 @@
     <div style="margin-top: 20px;">
         {{ $orders->links() }}
     </div>
+
+    <!-- CASH PAYMENT CALCULATOR MODAL FOR DASHBOARD -->
+    <div class="pos-modal-overlay" id="dashboardCashModal">
+        <div class="pos-modal-card" style="max-width: 460px;">
+            <div class="pos-modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; background: var(--accent-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                        <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-dark);">Bayar Tunai di Kasir</h3>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);" id="cashModalSubtitle">Order #000</div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="closeCashPaymentModal()">&times;</button>
+            </div>
+
+            <div class="pos-modal-body">
+                <input type="hidden" id="cashModalOrderId">
+                <input type="hidden" id="cashModalTotalAmount">
+
+                <div style="background: linear-gradient(135deg, #3c2a21 0%, #1e140e 100%); border-radius: 12px; padding: 16px; color: #fff; text-align: center; margin-bottom: 16px;">
+                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.7); text-transform: uppercase; font-weight: 700;">Total Tagihan</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent);" id="cashModalTotalDisplay">Rp 0</div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-dark); margin-bottom: 6px; display: block;">
+                        Uang Tunai Diterima (Rp) <span style="color: var(--danger);">*</span>
+                    </label>
+                    <div style="position: relative;">
+                        <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--primary); font-size: 1.1rem;">Rp</span>
+                        <input type="number" id="dashInputCashReceived" class="input-pos-cash" placeholder="0" oninput="calculateDashChange()" style="padding-left: 44px; font-size: 1.25rem; font-weight: 800; color: var(--primary); width: 100%;">
+                    </div>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="quick-cash-grid">
+                    <button type="button" class="btn-quick-cash" onclick="setDashCashExact()">Uang Pas</button>
+                    <button type="button" class="btn-quick-cash" onclick="setDashCashPreset(20000)">20.000</button>
+                    <button type="button" class="btn-quick-cash" onclick="setDashCashPreset(50000)">50.000</button>
+                    <button type="button" class="btn-quick-cash" onclick="setDashCashPreset(100000)">100.000</button>
+                    <button type="button" class="btn-quick-cash" onclick="setDashCashPreset(200000)">200.000</button>
+                    <button type="button" class="btn-quick-cash" onclick="setDashCashPreset(500000)">500.000</button>
+                </div>
+
+                <div class="change-calc-box" id="dashChangeCalcBox">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);" id="dashChangeLabel">KEMBALIAN:</div>
+                    <div class="change-val" id="dashChangeVal">Rp 0</div>
+                </div>
+            </div>
+
+            <div class="pos-modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeCashPaymentModal()">Batal</button>
+                <button type="button" class="btn btn-accent" id="btnSubmitDashCash" onclick="submitDashCashPayment()" style="font-weight: 800; min-width: 180px;">
+                    <span>KONFIRMASI LUNAS</span>
+                    <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </button>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -265,6 +350,138 @@
     0% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.4; transform: scale(1.2); }
     100% { opacity: 1; transform: scale(1); }
+}
+
+/* Modal Styling */
+.pos-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(18, 12, 8, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pos-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.pos-modal-card {
+    background: #ffffff;
+    width: 92%;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    transform: translateY(20px) scale(0.96);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pos-modal-overlay.active .pos-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.pos-modal-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.btn-close-modal {
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.pos-modal-body {
+    padding: 20px;
+}
+
+.pos-modal-footer {
+    padding: 14px 20px;
+    background: #faf8f5;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.input-pos-cash {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.input-pos-cash:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.2);
+}
+
+.quick-cash-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.btn-quick-cash {
+    background: #ffffff;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-quick-cash:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--primary);
+}
+
+.change-calc-box {
+    background: var(--success-bg);
+    border: 1.5px solid #c8e6c9;
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.change-calc-box.underpaid {
+    background: var(--danger-bg);
+    border-color: #ffcdd2;
+}
+
+.change-val {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--success);
+}
+
+.change-calc-box.underpaid .change-val {
+    color: var(--danger);
+    font-size: 1.1rem;
 }
 </style>
 
@@ -312,22 +529,124 @@
                 const btn = el.querySelector('.btn-dots');
                 if (btn) btn.classList.remove('active');
             });
+            closeCashPaymentModal();
         }
     });
 
-    // Live poll refresh cashier table every 6 seconds (only if user is not interacting with a dropdown)
+    // Print Receipt in popup
+    function printReceipt(orderId) {
+        const url = `/cashier/orders/${orderId}/receipt?print=1`;
+        const printWin = window.open(url, '_blank', 'width=450,height=600,top=100,left=100');
+        if (printWin) {
+            printWin.focus();
+        }
+    }
+
+    // Cash Payment Modal for Unpaid Orders
+    let currentDashOrderId = null;
+    let currentDashTotal = 0;
+
+    function openCashPaymentModal(orderId, orderNumber, totalAmount, customerName) {
+        currentDashOrderId = orderId;
+        currentDashTotal = totalAmount;
+
+        document.getElementById('cashModalOrderId').value = orderId;
+        document.getElementById('cashModalTotalAmount').value = totalAmount;
+        document.getElementById('cashModalSubtitle').innerText = `#${orderNumber} • ${customerName}`;
+        document.getElementById('cashModalTotalDisplay').innerText = `Rp ${new Intl.NumberFormat('id-ID').format(totalAmount)}`;
+        document.getElementById('dashInputCashReceived').value = totalAmount;
+
+        calculateDashChange();
+        document.getElementById('dashboardCashModal').classList.add('active');
+    }
+
+    function closeCashPaymentModal() {
+        document.getElementById('dashboardCashModal').classList.remove('active');
+    }
+
+    function setDashCashExact() {
+        document.getElementById('dashInputCashReceived').value = currentDashTotal;
+        calculateDashChange();
+    }
+
+    function setDashCashPreset(val) {
+        document.getElementById('dashInputCashReceived').value = val;
+        calculateDashChange();
+    }
+
+    function calculateDashChange() {
+        const cash = parseFloat(document.getElementById('dashInputCashReceived').value) || 0;
+        const box = document.getElementById('dashChangeCalcBox');
+        const label = document.getElementById('dashChangeLabel');
+        const valEl = document.getElementById('dashChangeVal');
+        const btnSubmit = document.getElementById('btnSubmitDashCash');
+
+        if (cash < currentDashTotal) {
+            box.classList.add('underpaid');
+            label.innerText = 'UANG KURANG:';
+            valEl.innerText = `- Rp ${new Intl.NumberFormat('id-ID').format(currentDashTotal - cash)}`;
+            btnSubmit.disabled = true;
+        } else {
+            box.classList.remove('underpaid');
+            label.innerText = 'KEMBALIAN:';
+            valEl.innerText = `Rp ${new Intl.NumberFormat('id-ID').format(cash - currentDashTotal)}`;
+            btnSubmit.disabled = false;
+        }
+    }
+
+    function submitDashCashPayment() {
+        if (!currentDashOrderId) return;
+        const cashReceived = parseFloat(document.getElementById('dashInputCashReceived').value) || 0;
+        const btn = document.getElementById('btnSubmitDashCash');
+        btn.disabled = true;
+        btn.innerText = 'Memproses...';
+
+        fetch(`/cashier/orders/${currentDashOrderId}/confirm-cash`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                cash_received: cashReceived
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                closeCashPaymentModal();
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert(data.message || 'Terjadi kesalahan');
+                btn.disabled = false;
+                btn.innerText = 'KONFIRMASI LUNAS';
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerText = 'KONFIRMASI LUNAS';
+            alert('Gagal menghubungi server.');
+        });
+    }
+
+    // Live poll refresh cashier table every 8 seconds (only if user is not interacting with modal or dropdown)
     setInterval(function() {
         const hasOpenDropdown = document.querySelector('.action-dropdown.open');
-        if (!hasOpenDropdown) {
+        const hasOpenModal = document.querySelector('.pos-modal-overlay.active');
+        if (!hasOpenDropdown && !hasOpenModal) {
             fetch(window.location.href, {
                 headers: { 'Accept': 'application/json' }
             })
             .then(res => res.json())
             .then(data => {
+                // background auto reload
                 window.location.reload();
             }).catch(err => {});
         }
-    }, 6000);
+    }, 8000);
 </script>
 @endpush
+
 

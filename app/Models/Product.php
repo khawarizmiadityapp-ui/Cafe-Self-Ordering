@@ -26,6 +26,21 @@ class Product extends Model
         'is_available' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute(): string
+    {
+        if (empty($this->image)) {
+            return asset('images/coffee-default.svg');
+        }
+
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+            return $this->image;
+        }
+
+        return asset('storage/' . ltrim($this->image, '/'));
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

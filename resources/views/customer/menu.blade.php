@@ -49,7 +49,7 @@
 
                 @foreach($category->products as $product)
                     <div class="product-card">
-                        <img src="{{ $product->image ?: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300' }}" alt="{{ $product->name }}" class="product-img">
+                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img" onerror="this.onerror=null; this.src='{{ asset('images/coffee-default.svg') }}'">
                         <div class="product-info">
                             <div>
                                 <div class="product-name">{{ $product->name }}</div>
