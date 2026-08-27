@@ -296,13 +296,17 @@
             </p>
 
             <div class="receipt-preview-box" id="receiptPreviewContainer">
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
                     <span style="color: var(--text-muted);">No. Order:</span>
                     <strong id="receiptOrderNumber">#ORD-000</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
-                    <span style="color: var(--text-muted);">Total Bayar:</span>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;">
+                    <span style="color: var(--text-muted);">Total Tagihan:</span>
                     <strong id="receiptTotalAmount" style="color: var(--primary);">Rp 0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px;" id="receiptCashReceivedRow">
+                    <span style="color: var(--text-muted);">Tunai Diterima:</span>
+                    <strong id="receiptCashReceivedAmount">Rp 0</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;" id="receiptChangeRow">
                     <span style="color: var(--text-muted);">Kembalian:</span>
@@ -1306,22 +1310,29 @@
             },
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
+        .then(async res => {
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+                const errMsg = (data && data.message) ? data.message : `Error (${res.status}): Gagal memproses pesanan.`;
+                throw new Error(errMsg);
+            }
+            return data;
+        })
         .then(data => {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = `<span>KONFIRMASI BAYAR</span><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
-            if (data.success) {
+            if (data && data.success) {
                 closePaymentModal();
                 showReceiptSuccess(data.order, data.receipt_url);
             } else {
-                alert(data.message || 'Terjadi kesalahan saat memproses pesanan.');
+                alert((data && data.message) || 'Terjadi kesalahan saat memproses pesanan.');
             }
         })
         .catch(err => {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = `<span>KONFIRMASI BAYAR</span><svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-            alert('Gagal menghubungi server. Silakan coba kembali.');
+            alert(err.message || 'Gagal menghubungi server. Silakan coba kembali.');
         });
     }
 
@@ -1331,11 +1342,20 @@
         document.getElementById('receiptOrderNumber').innerText = '#' + order.order_number;
         document.getElementById('receiptTotalAmount').innerText = 'Rp ' + numberFormat(order.total_amount);
 
+        const cashRow = document.getElementById('receiptCashReceivedRow');
         const changeRow = document.getElementById('receiptChangeRow');
-        if (order.payment && order.payment.payload && order.payment.payload.cash_change > 0) {
+
+        if (order.payment && order.payment.payload && (order.payment.payment_gateway === 'cash' || order.payment_method === 'cash')) {
+            const cashReceived = order.payment.payload.cash_received ?? order.total_amount;
+            const cashChange = order.payment.payload.cash_change ?? 0;
+
+            cashRow.style.display = 'flex';
+            document.getElementById('receiptCashReceivedAmount').innerText = 'Rp ' + numberFormat(cashReceived);
+
             changeRow.style.display = 'flex';
-            document.getElementById('receiptChangeAmount').innerText = 'Rp ' + numberFormat(order.payment.payload.cash_change);
+            document.getElementById('receiptChangeAmount').innerText = 'Rp ' + numberFormat(cashChange);
         } else {
+            cashRow.style.display = 'none';
             changeRow.style.display = 'none';
         }
 
@@ -1343,9 +1363,10 @@
     }
 
     // Print Receipt via Popup Window
+    const cashierReceiptBaseUrl = "{{ url('cashier/orders') }}";
     function printReceiptDirectly() {
         if (!lastCreatedOrderId) return;
-        const url = `/cashier/orders/${lastCreatedOrderId}/receipt?print=1`;
+        const url = `${cashierReceiptBaseUrl}/${lastCreatedOrderId}/receipt?print=1`;
         const printWindow = window.open(url, '_blank', 'width=450,height=600,top=100,left=100');
         if (printWindow) {
             printWindow.focus();

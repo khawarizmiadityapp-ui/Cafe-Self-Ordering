@@ -11,7 +11,7 @@
     <div class="staff-wrapper">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div>
+            <div class="sidebar-nav-body">
                 <div class="sidebar-brand">
                     <div class="sidebar-brand-icon">
                         <!-- Coffee Cup SVG -->
@@ -111,16 +111,19 @@
                 </ul>
             </div>
 
-            <div style="border-top: 1px solid var(--border-dark); padding-top: 18px; margin-top: 20px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-                    <div>
-                        <div style="font-size: 0.88rem; font-weight: 700; color: #fff;">{{ auth()->user()->name ?? 'Administrator' }}</div>
-                        <div style="font-size: 0.75rem; color: var(--accent);">Role: System Admin</div>
+            <div class="sidebar-footer">
+                <div class="sidebar-user-card">
+                    <div class="sidebar-user-avatar">
+                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    </div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">{{ auth()->user()->name ?? 'Administrator' }}</div>
+                        <div class="sidebar-user-role">System Admin</div>
                     </div>
                 </div>
-                <form action="{{ route('logout') }}" method="POST">
+                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
                     @csrf
-                    <button type="submit" class="btn btn-danger btn-sm btn-block">
+                    <button type="submit" class="btn btn-danger btn-sm btn-block" style="font-weight: 700; border-radius: 8px;">
                         <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                             <polyline points="16 17 21 12 16 7"></polyline>

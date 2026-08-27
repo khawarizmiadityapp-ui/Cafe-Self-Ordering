@@ -533,9 +533,12 @@
         }
     });
 
+    // Base URL for cashier orders
+    const cashierOrdersBaseUrl = "{{ url('cashier/orders') }}";
+
     // Print Receipt in popup
     function printReceipt(orderId) {
-        const url = `/cashier/orders/${orderId}/receipt?print=1`;
+        const url = `${cashierOrdersBaseUrl}/${orderId}/receipt?print=1`;
         const printWin = window.open(url, '_blank', 'width=450,height=600,top=100,left=100');
         if (printWin) {
             printWin.focus();
@@ -601,25 +604,35 @@
         btn.disabled = true;
         btn.innerText = 'Memproses...';
 
-        fetch(`/cashier/orders/${currentDashOrderId}/confirm-cash`, {
+        const tokenEl = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = tokenEl ? tokenEl.getAttribute('content') : '';
+
+        fetch(`${cashierOrdersBaseUrl}/${currentDashOrderId}/confirm-cash`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify({
                 cash_received: cashReceived
             })
         })
-        .then(res => res.json())
+        .then(async res => {
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+                const errMsg = (data && data.message) ? data.message : `Error (${res.status}): Gagal memproses konfirmasi pembayaran.`;
+                throw new Error(errMsg);
+            }
+            return data;
+        })
         .then(data => {
-            if (data.success) {
+            if (data && data.success) {
                 closeCashPaymentModal();
                 alert(data.message);
                 window.location.reload();
             } else {
-                alert(data.message || 'Terjadi kesalahan');
+                alert((data && data.message) || 'Terjadi kesalahan saat memproses pembayaran.');
                 btn.disabled = false;
                 btn.innerText = 'KONFIRMASI LUNAS';
             }
@@ -627,7 +640,7 @@
         .catch(err => {
             btn.disabled = false;
             btn.innerText = 'KONFIRMASI LUNAS';
-            alert('Gagal menghubungi server.');
+            alert(err.message || 'Gagal menghubungi server. Silakan coba kembali.');
         });
     }
 

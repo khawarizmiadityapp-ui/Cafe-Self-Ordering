@@ -253,54 +253,62 @@ class CashierController extends Controller
         $order = Order::with('payment')->findOrFail($id);
 
         if ($order->payment_status === 'PAID') {
-            if ($request->wantsJson()) {
-                return response()->json(['success' => false, 'message' => 'Pesanan ini sudah LUNAS.']);
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Pesanan ini sudah LUNAS.'], 422);
             }
             return back()->with('info', 'Pembayaran untuk pesanan ini sudah LUNAS.');
         }
 
+        $minAmount = floatval($order->total_amount);
+
         $validated = $request->validate([
-            'cash_received' => 'required|numeric|min:' . $order->total_amount,
+            'cash_received' => 'required|numeric|min:' . $minAmount,
+        ], [
+            'cash_received.required' => 'Nominal uang tunai harus diisi.',
+            'cash_received.numeric' => 'Nominal uang tunai harus berupa angka.',
+            'cash_received.min' => 'Nominal uang tunai kurang dari total tagihan (Rp ' . number_format($minAmount, 0, ',', '.') . ').',
         ]);
 
         $cashReceived = floatval($validated['cash_received']);
-        $cashChange = max(0, $cashReceived - $order->total_amount);
+        $cashChange = max(0, $cashReceived - $minAmount);
 
-        if ($order->payment) {
-            $order->payment->update([
-                'status' => 'PAID',
-                'payload' => array_merge($order->payment->payload ?? [], [
-                    'cash_received' => $cashReceived,
-                    'cash_change' => $cashChange,
-                    'confirmed_by' => auth()->id(),
-                    'cashier_name' => auth()->user()->name ?? 'Kasir',
-                    'confirmed_at' => now()->toDateTimeString(),
-                ]),
+        DB::transaction(function () use ($order, $cashReceived, $cashChange) {
+            if ($order->payment) {
+                $order->payment->update([
+                    'status' => 'PAID',
+                    'payload' => array_merge($order->payment->payload ?? [], [
+                        'cash_received' => $cashReceived,
+                        'cash_change' => $cashChange,
+                        'confirmed_by' => auth()->id(),
+                        'cashier_name' => auth()->user()->name ?? 'Kasir',
+                        'confirmed_at' => now()->toDateTimeString(),
+                    ]),
+                ]);
+            } else {
+                Payment::create([
+                    'order_id' => $order->id,
+                    'payment_gateway' => 'cash',
+                    'transaction_id' => 'CASH-' . Str::upper(Str::random(8)),
+                    'reference_number' => 'CASH-' . $order->order_number,
+                    'amount' => $order->total_amount,
+                    'status' => 'PAID',
+                    'payload' => [
+                        'cash_received' => $cashReceived,
+                        'cash_change' => $cashChange,
+                        'confirmed_by' => auth()->id(),
+                        'cashier_name' => auth()->user()->name ?? 'Kasir',
+                        'confirmed_at' => now()->toDateTimeString(),
+                    ],
+                ]);
+            }
+
+            $order->update([
+                'payment_status' => 'PAID',
+                'paid_at' => now(),
             ]);
-        } else {
-            Payment::create([
-                'order_id' => $order->id,
-                'payment_gateway' => 'cash',
-                'transaction_id' => 'CASH-' . Str::upper(Str::random(8)),
-                'reference_number' => 'CASH-' . $order->order_number,
-                'amount' => $order->total_amount,
-                'status' => 'PAID',
-                'payload' => [
-                    'cash_received' => $cashReceived,
-                    'cash_change' => $cashChange,
-                    'confirmed_by' => auth()->id(),
-                    'cashier_name' => auth()->user()->name ?? 'Kasir',
-                    'confirmed_at' => now()->toDateTimeString(),
-                ],
-            ]);
-        }
+        });
 
-        $order->update([
-            'payment_status' => 'PAID',
-            'paid_at' => now(),
-        ]);
-
-        if ($request->wantsJson()) {
+        if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => "Pembayaran Order #{$order->order_number} berhasil dikonfirmasi LUNAS! Kembalian: Rp " . number_format($cashChange, 0, ',', '.'),
@@ -321,15 +329,33 @@ class CashierController extends Controller
             return back()->with('info', 'Pembayaran untuk pesanan ini sudah LUNAS.');
         }
 
-        if ($order->payment) {
-            $cashService = new CashPaymentService();
-            $cashService->verifyPayment($order->payment);
-        } else {
-            $order->update([
-                'payment_status' => 'PAID',
-                'paid_at' => now(),
-            ]);
-        }
+        DB::transaction(function () use ($order) {
+            if ($order->payment) {
+                $cashService = new CashPaymentService();
+                $cashService->verifyPayment($order->payment);
+            } else {
+                Payment::create([
+                    'order_id' => $order->id,
+                    'payment_gateway' => $order->payment_method ?? 'cash',
+                    'transaction_id' => strtoupper($order->payment_method ?? 'CASH') . '-' . Str::upper(Str::random(8)),
+                    'reference_number' => strtoupper($order->payment_method ?? 'CASH') . '-' . $order->order_number,
+                    'amount' => $order->total_amount,
+                    'status' => 'PAID',
+                    'payload' => [
+                        'cash_received' => $order->total_amount,
+                        'cash_change' => 0,
+                        'confirmed_by' => auth()->id(),
+                        'cashier_name' => auth()->user()->name ?? 'Kasir',
+                        'confirmed_at' => now()->toDateTimeString(),
+                    ],
+                ]);
+
+                $order->update([
+                    'payment_status' => 'PAID',
+                    'paid_at' => now(),
+                ]);
+            }
+        });
 
         return back()->with('success', "Pembayaran untuk Order #{$order->order_number} berhasil dikonfirmasi (PAID)!");
     }

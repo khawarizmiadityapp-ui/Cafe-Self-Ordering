@@ -159,7 +159,7 @@
         </div>
         <div class="receipt-info-row">
             <span>Kasir:</span>
-            <span>{{ $order->payment->payload['cashier_name'] ?? 'Kasir' }}</span>
+            <span>{{ $order->payment?->payload['cashier_name'] ?? (auth()->user()->name ?? 'Kasir') }}</span>
         </div>
         <div class="receipt-info-row">
             <span>Pelanggan:</span>
@@ -175,22 +175,32 @@
         <table class="receipt-items-table">
             <thead>
                 <tr>
-                    <th style="width: 55%;">Item</th>
-                    <th style="width: 15%; text-align: center;">Qty</th>
-                    <th style="width: 30%; text-align: right;">Total</th>
+                    <th style="width: 52%;">Item</th>
+                    <th style="width: 16%; text-align: center;">Qty</th>
+                    <th style="width: 32%; text-align: right;">Total</th>
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $totalQty = 0;
+                    $calculatedSubtotal = 0;
+                @endphp
                 @foreach($order->items as $item)
+                    @php
+                        $itemSubtotal = $item->subtotal ?? ($item->price * $item->quantity);
+                        $calculatedSubtotal += $itemSubtotal;
+                        $totalQty += $item->quantity;
+                    @endphp
                     <tr>
                         <td>
-                            <div>{{ $item->product->name }}</div>
+                            <div style="font-weight: bold;">{{ $item->product->name ?? 'Menu Item' }}</div>
+                            <div style="font-size: 10px; color: #555;">@ Rp{{ number_format($item->price, 0, ',', '.') }}</div>
                             @if($item->notes)
                                 <div class="item-notes">"{{ $item->notes }}"</div>
                             @endif
                         </td>
-                        <td style="text-align: center;">{{ $item->quantity }}</td>
-                        <td style="text-align: right;">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                        <td style="text-align: center; vertical-align: middle;">{{ $item->quantity }}</td>
+                        <td style="text-align: right; vertical-align: middle; font-weight: bold;">Rp{{ number_format($itemSubtotal, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -199,8 +209,12 @@
         <div class="receipt-divider"></div>
 
         <div class="receipt-info-row">
+            <span>Total Item (Qty):</span>
+            <span>{{ $totalQty }} item</span>
+        </div>
+        <div class="receipt-info-row">
             <span>Subtotal:</span>
-            <span>Rp{{ number_format($order->total_amount, 0, ',', '.') }}</span>
+            <span>Rp{{ number_format($calculatedSubtotal > 0 ? $calculatedSubtotal : $order->total_amount, 0, ',', '.') }}</span>
         </div>
         <div class="receipt-total-row">
             <span>TOTAL:</span>
@@ -211,28 +225,28 @@
 
         <div class="receipt-info-row">
             <span>Metode Bayar:</span>
-            <strong>{{ strtoupper($order->payment_method) }}</strong>
+            <strong>{{ strtoupper($order->payment_method ?? 'CASH') }}</strong>
         </div>
 
         @php
-            $cashReceived = $order->payment->payload['cash_received'] ?? $order->total_amount;
-            $cashChange = $order->payment->payload['cash_change'] ?? 0;
+            $cashReceived = $order->payment?->payload['cash_received'] ?? $order->total_amount;
+            $cashChange = $order->payment?->payload['cash_change'] ?? 0;
         @endphp
 
-        @if($order->payment_method === 'cash')
+        @if(($order->payment_method ?? 'cash') === 'cash')
             <div class="receipt-info-row">
                 <span>Tunai Diterima:</span>
                 <span>Rp{{ number_format($cashReceived, 0, ',', '.') }}</span>
             </div>
             <div class="receipt-info-row">
                 <span>Kembalian:</span>
-                <strong>Rp{{ number_format($cashChange, 0, ',', '.') }}</strong>
+                <strong style="color: #111;">Rp{{ number_format($cashChange, 0, ',', '.') }}</strong>
             </div>
         @endif
 
         <div class="receipt-info-row">
             <span>Status:</span>
-            <strong>LUNAS (PAID)</strong>
+            <strong>{{ $order->payment_status === 'PAID' ? 'LUNAS (PAID)' : 'BELUM LUNAS (UNPAID)' }}</strong>
         </div>
 
         <div class="receipt-footer">
