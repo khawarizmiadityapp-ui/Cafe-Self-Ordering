@@ -2,27 +2,58 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>@yield('title', 'Admin Panel - Cafe Self-Ordering System')</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
+    <!-- Mobile Navigation Top Bar (< 1024px) -->
+    <header class="admin-mobile-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button type="button" onclick="toggleAdminSidebar()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; padding: 8px 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #d4a373 0%, #b88252 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ffffff;">
+                    <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
+                </div>
+                <div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: #ffffff; line-height: 1.1;">KAFE DIGITAL</div>
+                    <div style="font-size: 0.65rem; color: var(--accent); font-weight: 600; text-transform: uppercase;">Admin Portal</div>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--accent); color: #ffffff; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
+                {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="adminSidebarOverlay" class="admin-sidebar-overlay" onclick="toggleAdminSidebar()"></div>
+
     <div class="staff-wrapper">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <!-- Sidebar Navigation (Desktop Fixed & Mobile Slide-out Drawer) -->
+        <aside class="sidebar" id="adminSidebar">
             <div class="sidebar-nav-body">
-                <div class="sidebar-brand">
-                    <div class="sidebar-brand-icon">
-                        <!-- Coffee Cup SVG -->
-                        <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24">
-                            <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"></path>
-                        </svg>
+                <div class="sidebar-brand" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="sidebar-brand-icon">
+                            <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24">
+                                <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div style="line-height: 1.1; font-weight: 800;">KAFE DIGITAL</div>
+                            <div style="font-size: 0.72rem; color: var(--accent); font-weight: 600; text-transform: uppercase;">Admin Portal</div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="line-height: 1.1; font-weight: 800;">KAFE DIGITAL</div>
-                        <div style="font-size: 0.72rem; color: var(--accent); font-weight: 600; text-transform: uppercase;">Admin Portal</div>
-                    </div>
+                    <button type="button" onclick="toggleAdminSidebar()" class="admin-drawer-close-btn" style="background: none; border: none; color: #a09083; font-size: 1.5rem; cursor: pointer; padding: 4px;" aria-label="Tutup Menu">
+                        &times;
+                    </button>
                 </div>
 
                 <div class="sidebar-label">Menu Utama</div>
@@ -79,12 +110,10 @@
                     </li>
                     <li>
                         <a href="{{ route('admin.reports.index') }}" class="sidebar-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
-                            <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24">
-                                <line x1="18" y1="20" x2="18" y2="10"></line>
-                                <line x1="12" y1="20" x2="12" y2="4"></line>
-                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; min-width: 20px;">
+                                <path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"></path>
                             </svg>
-                            <span>Laporan Penjualan</span>
+                            <span>Rekap & Laporan Transaksi</span>
                         </a>
                     </li>
                 </ul>
@@ -154,6 +183,38 @@
         </main>
     </div>
 
+    <script>
+        function toggleAdminSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('adminSidebarOverlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            }
+        }
+
+        function toggleKebabMenu(btn, e) {
+            e.stopPropagation();
+            const dropdown = btn.closest('.action-dropdown');
+            const isOpen = dropdown.classList.contains('open');
+
+            document.querySelectorAll('.action-dropdown.open').forEach(d => {
+                if (d !== dropdown) d.classList.remove('open');
+            });
+
+            if (isOpen) {
+                dropdown.classList.remove('open');
+            } else {
+                dropdown.classList.add('open');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.action-dropdown')) {
+                document.querySelectorAll('.action-dropdown.open').forEach(d => d.classList.remove('open'));
+            }
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

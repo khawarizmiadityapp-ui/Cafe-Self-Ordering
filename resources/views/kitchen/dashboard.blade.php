@@ -1,109 +1,139 @@
 @extends('layouts.staff')
 
-@section('title', 'Kitchen Display System (KDS) - Cafe Self-Ordering')
+@section('title', 'Layar Dapur & Barista (KDS) - Meja Kopi')
 
 @section('content')
-    <div class="page-header" style="margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #ed6c02 0%, #c75600 100%); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 14px rgba(237, 108, 2, 0.35);">
-                <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
+<div class="max-w-7xl mx-auto space-y-6 font-sans antialiased text-stone-800">
+
+    <!-- Header Bar Dapur -->
+    <div class="bg-stone-900 text-white p-5 rounded-2xl shadow-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border border-stone-800">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-amber-600 flex items-center justify-center text-white shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
             </div>
             <div>
-                <h1 class="page-title" style="font-size: 1.6rem; margin-bottom: 2px;">Kitchen & Barista Display System</h1>
-                <p style="font-size: 0.875rem; color: var(--text-muted);">Layar khusus Dapur / Barista untuk memproses orderan masuk</p>
+                <h1 class="text-xl font-bold text-white tracking-tight">Antrean Dapur & Barista</h1>
+                <p class="text-xs text-stone-400 font-medium mt-0.5">Daftar pesanan masuk yang perlu dimasak dan disajikan</p>
             </div>
         </div>
-        <div>
-            <span class="badge badge-success" style="padding: 8px 16px; font-size: 0.825rem; background: #ffffff; border: 1.5px solid var(--border-color); box-shadow: var(--shadow-xs); color: var(--success);">
-                <span style="display: inline-block; width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 1.5s infinite; margin-right: 4px;"></span>
-                LIVE KITCHEN FEED
-            </span>
+
+        <div class="flex items-center gap-3">
+            <div class="bg-stone-800 px-3.5 py-1.5 rounded-xl border border-stone-700 text-xs font-bold text-amber-400">
+                <span id="activeKitchenCount">{{ $orders->count() }}</span> Pesanan Masuk
+            </div>
         </div>
     </div>
 
-    <!-- Active Orders Grid -->
-    <div class="kitchen-grid">
+    <!-- Active Orders Grid for Kitchen (Max 4 Columns Across) -->
+    <div id="kitchenGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4.5">
         @forelse($orders as $order)
-            <div class="kitchen-card {{ $order->order_status === 'PROCESSING' ? 'processing' : '' }}">
-                <div class="kitchen-header">
-                    <div>
-                        <div class="kitchen-table-num">{{ $order->table ? 'MEJA ' . $order->table->table_number : 'TAKEAWAY (BUNGKUS)' }}</div>
-                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
-                            {{ $order->customer_name }} • {{ $order->order_number }}
-                        </div>
+            @php
+                $isProcessing = $order->order_status === 'PROCESSING';
+                $cardBorder = $isProcessing ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-stone-200';
+            @endphp
+
+            <div class="bg-white rounded-2xl border {{ $cardBorder }} shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden">
+                <!-- Header Tiket Dapur (Simple Clean Layout) -->
+                <div class="p-4 bg-stone-50/80 border-b border-stone-200/80 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-bold text-stone-900 tracking-tight">
+                            {{ $order->table ? 'MEJA ' . sprintf('%02d', $order->table->table_number) : 'TAKEAWAY' }}
+                        </h2>
+                        @if($isProcessing)
+                            <span class="px-3 py-1 bg-amber-50 text-amber-600 rounded-full font-bold text-xs border border-amber-200">
+                                PROSES
+                            </span>
+                        @else
+                            <span class="px-3 py-1 bg-sky-50 text-sky-500 rounded-full font-bold text-xs border border-sky-200">
+                                BARU MASUK
+                            </span>
+                        @endif
                     </div>
-                    <div style="text-align: right;">
-                        <span class="badge {{ $order->order_status === 'PROCESSING' ? 'badge-warning' : 'badge-info' }}" style="font-size: 0.8rem; padding: 6px 12px;">
-                            {{ $order->order_status === 'PROCESSING' ? 'DIPROSES' : 'BARU MASUK' }}
-                        </span>
-                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; font-weight: 700;">
-                            {{ $order->created_at->diffForHumans() }}
+                    <div class="flex items-center justify-between text-xs text-stone-500 font-medium pt-0.5">
+                        <div class="truncate">
+                            <span>{{ $order->customer_name }}</span>
+                            <span class="mx-1">•</span>
+                            <span>{{ $order->order_number }}</span>
                         </div>
+                        <span class="shrink-0 ml-2">
+                            {{ $order->created_at->diffForHumans() }}
+                        </span>
                     </div>
                 </div>
 
-                <div class="kitchen-items">
-                    @foreach($order->items as $item)
-                        <div class="kitchen-item-row">
-                            <div>
-                                <div class="item-qty-name">
-                                    <span style="color: var(--primary); font-size: 1.15rem;">{{ $item->quantity }}x</span>
-                                    <span>{{ $item->product->name }}</span>
+                <!-- Body Tiket (Daftar Menu & Catatan) -->
+                <div class="p-4 space-y-3 flex-1">
+                    <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
+                        @foreach($order->items as $item)
+                            <div class="p-2.5 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
+                                <div class="flex items-start gap-2">
+                                    <span class="px-2 py-0.5 bg-stone-900 text-white font-bold text-xs rounded-md shrink-0">
+                                        {{ $item->quantity }}x
+                                    </span>
+                                    <span class="font-semibold text-sm text-stone-900 leading-snug">
+                                        {{ $item->product->name ?? 'Menu Produk' }}
+                                    </span>
                                 </div>
                                 @if($item->notes)
-                                    <div class="item-notes" style="display: flex; align-items: center; gap: 4px; margin-top: 4px;">
-                                        <svg class="svg-icon svg-icon-sm" style="color: var(--danger);" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                        <span>{{ $item->notes }}</span>
+                                    <div class="mt-1 text-xs text-amber-900 bg-amber-50 border border-amber-200 p-1.5 rounded-lg font-medium">
+                                        Catatan: {{ $item->notes }}
                                     </div>
                                 @endif
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
 
-                <div style="padding: 12px 16px; background: #faf8f5; border-top: 1px solid var(--border-color);">
+                <!-- Tombol Aksi Dapur -->
+                <div class="p-3 bg-stone-50 border-t border-stone-200/80">
                     @if($order->order_status === 'WAITING_KITCHEN')
                         <form action="{{ route('kitchen.orders.process', $order->id) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-warning btn-block" style="padding: 12px; font-size: 0.95rem; background: #ed6c02; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                <span>MULAI PROSES</span>
+                            <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase flex items-center justify-center gap-2 shadow-xs transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                                <span>Mulai Proses Masak</span>
                             </button>
                         </form>
-                    @elseif($order->order_status === 'PROCESSING')
+                    @else
                         <form action="{{ route('kitchen.orders.complete', $order->id) }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-success btn-block" style="padding: 12px; font-size: 0.95rem; background: #2e7d32; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                <span>SELESAI & SAJIKAN</span>
+                            <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase flex items-center justify-center gap-2 shadow-xs transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Selesai & Sajikan</span>
                             </button>
                         </form>
                     @endif
                 </div>
             </div>
         @empty
-            <div style="grid-column: 1 / -1; background: #ffffff; padding: 60px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-color);">
-                <div style="width: 56px; height: 56px; background: var(--accent-light); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; color: var(--primary);">
-                    <svg class="svg-icon svg-icon-xl" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"></path></svg>
+            <div class="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-stone-300 p-8">
+                <div class="w-12 h-12 rounded-xl bg-stone-100 text-stone-500 flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h3 style="font-size: 1.3rem; font-weight: 700; color: var(--text-dark);">Belum Ada Pesanan yang Perlu Diproses</h3>
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;">Pesanan yang telah divalidasi oleh kasir akan muncul di layar ini secara otomatis.</p>
+                <h3 class="text-sm font-bold text-stone-800">Tidak ada antrean pesanan di Dapur</h3>
+                <p class="text-xs text-stone-500 mt-1 font-medium">Pesanan yang dikirim dari kasir/pelanggan akan otomatis muncul di sini</p>
             </div>
         @endforelse
     </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
-    // Live refresh kitchen feed every 4 seconds
+
+    // Auto Refresh Feed Periodically
     setInterval(function() {
         fetch(window.location.href, {
             headers: { 'Accept': 'application/json' }
         })
         .then(res => res.json())
         .then(data => {
-            // Automatic sync reload if orders payload count or list changes
-            window.location.reload();
+            const currentCount = Number(document.getElementById('activeKitchenCount')?.innerText || 0);
+            if (data.orders && data.orders.length !== currentCount) {
+                window.location.reload();
+            }
         }).catch(err => {});
     }, 4000);
 </script>

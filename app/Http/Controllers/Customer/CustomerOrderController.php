@@ -35,6 +35,16 @@ class CustomerOrderController extends Controller
             $table = Table::where('status', 'active')->first();
         }
 
+        if (!$table) {
+            // Fallback default object if database table is empty
+            $table = (object)[
+                'id' => 1,
+                'table_number' => '01',
+                'code' => '01',
+                'status' => 'active'
+            ];
+        }
+
         $categories = Category::where('is_active', true)
             ->orderBy('sort_order', 'asc')
             ->with(['products' => function ($query) {
@@ -42,9 +52,12 @@ class CustomerOrderController extends Controller
             }])
             ->get();
 
+        $productsData = Product::get()->keyBy('id');
+
         return view('customer.menu', [
             'table' => $table,
             'categories' => $categories,
+            'productsData' => $productsData,
         ]);
     }
 
@@ -55,7 +68,7 @@ class CustomerOrderController extends Controller
     public function storeOrder(Request $request)
     {
         $validated = $request->validate([
-            'table_id' => 'required|exists:tables,id',
+            'table_id' => 'nullable',
             'customer_name' => 'required|string|max:100',
             'payment_method' => 'required|in:cash,qris',
             'cart_items' => 'required|string', // JSON string from frontend cart
@@ -64,10 +77,23 @@ class CustomerOrderController extends Controller
         $rawItems = json_decode($validated['cart_items'], true);
 
         if (empty($rawItems) || !is_array($rawItems)) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Keranjang belanja Anda kosong.'], 422);
+            }
             return back()->with('error', 'Keranjang belanja Anda kosong. Silakan pilih menu terlebih dahulu.')->withInput();
         }
 
-        $table = Table::findOrFail($validated['table_id']);
+        $table = Table::find($validated['table_id'] ?? null);
+        if (!$table) {
+            $table = Table::where('status', 'active')->first();
+        }
+
+        if (!$table) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Meja tidak ditemukan.'], 422);
+            }
+            return back()->with('error', 'Meja tidak ditemukan. Silakan hubungi staf.')->withInput();
+        }
 
         try {
             $order = DB::transaction(function () use ($validated, $rawItems, $table) {
@@ -128,6 +154,19 @@ class CustomerOrderController extends Controller
                 return $order;
             });
 
+            $redirectUrl = $validated['payment_method'] === 'qris'
+                ? route('customer.payment.qris', ['order_number' => $order->order_number])
+                : route('customer.order.status', ['order_number' => $order->order_number]);
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pesanan berhasil dibuat!',
+                    'redirect_url' => $redirectUrl,
+                    'order_number' => $order->order_number,
+                ]);
+            }
+
             if ($validated['payment_method'] === 'qris') {
                 return redirect()->route('customer.payment.qris', ['order_number' => $order->order_number])
                     ->with('success', 'Pesanan berhasil dibuat. Silakan lakukan pembayaran QRIS.');
@@ -137,6 +176,9 @@ class CustomerOrderController extends Controller
                 ->with('success', 'Pesanan Anda telah diterima oleh Kasir! Silakan bayar di kasir.');
 
         } catch (\Exception $e) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
             return back()->with('error', $e->getMessage())->withInput();
         }
     }

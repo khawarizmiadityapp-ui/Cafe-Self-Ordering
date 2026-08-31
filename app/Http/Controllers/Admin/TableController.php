@@ -11,7 +11,7 @@ class TableController extends Controller
 {
     public function index()
     {
-        $tables = Table::withCount('orders')->orderBy('table_number', 'asc')->get();
+        $tables = Table::withCount('orders')->orderBy('table_number', 'asc')->paginate(7);
         return view('admin.tables.index', ['tables' => $tables]);
     }
 

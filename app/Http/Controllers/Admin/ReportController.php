@@ -13,8 +13,25 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $startDate = $request->query('start_date', now()->startOfMonth()->toDateString());
-        $endDate = $request->query('end_date', now()->toDateString());
+        $preset = $request->query('preset');
+        $todayStr = now()->toDateString();
+
+        if ($preset === 'today') {
+            $startDate = $todayStr;
+            $endDate = $todayStr;
+        } elseif ($preset === 'yesterday') {
+            $startDate = now()->subDay()->toDateString();
+            $endDate = now()->subDay()->toDateString();
+        } elseif ($preset === '7days') {
+            $startDate = now()->subDays(6)->toDateString();
+            $endDate = $todayStr;
+        } elseif ($preset === 'month') {
+            $startDate = now()->startOfMonth()->toDateString();
+            $endDate = $todayStr;
+        } else {
+            $startDate = $request->query('start_date', $todayStr);
+            $endDate = $request->query('end_date', $todayStr);
+        }
 
         $ordersQuery = Order::with(['table', 'items.product', 'payment'])
             ->where('payment_status', 'PAID')
@@ -35,9 +52,11 @@ class ReportController extends Controller
             ->groupBy('product_id')
             ->orderByDesc('total_qty')
             ->with('product')
+            ->take(8)
             ->get();
 
-        $orders = $ordersQuery->orderBy('created_at', 'desc')->paginate(20);
+        $avgOrderValue = $totalOrders > 0 ? ($totalRevenue / $totalOrders) : 0;
+        $orders = $ordersQuery->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.reports.index', [
             'startDate' => $startDate,
@@ -46,6 +65,7 @@ class ReportController extends Controller
             'totalOrders' => $totalOrders,
             'cashRevenue' => $cashRevenue,
             'qrisRevenue' => $qrisRevenue,
+            'avgOrderValue' => $avgOrderValue,
             'itemReport' => $itemReport,
             'orders' => $orders,
         ]);

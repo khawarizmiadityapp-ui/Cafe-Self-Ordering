@@ -20,7 +20,7 @@ class ProductController extends Controller
             $query->where('category_id', $categoryId);
         }
 
-        $products = $query->paginate(10);
+        $products = $query->paginate(7);
         $categories = Category::all();
 
         return view('admin.products.index', [

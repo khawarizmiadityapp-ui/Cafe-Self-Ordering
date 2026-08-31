@@ -3,13 +3,18 @@
 @section('title', 'Pembayaran QRIS - ' . $order->order_number)
 
 @section('content')
-    <header class="customer-header" style="text-align: center; padding-bottom: 24px;">
-        <div style="width: 52px; height: 52px; background: rgba(212, 163, 115, 0.2); border: 1.5px solid var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; color: var(--accent);">
-            <svg class="svg-icon svg-icon-xl" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+    <!-- Top Header Status (Sticky) -->
+    <div class="sticky-top-header" style="position: sticky; top: 0; z-index: 999; background: var(--bg-main, #faf7f2); box-shadow: 0 4px 16px rgba(0,0,0,0.12);">
+        <div class="customer-header" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 16px 22px 16px; border-radius: 0 0 24px 24px;">
+            <div style="width: 52px; height: 52px; background: rgba(212, 163, 115, 0.2); border: 1.5px solid var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; color: var(--accent);">
+                <svg class="svg-icon svg-icon-xl" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+            </div>
+            <h1 style="font-size: 1.3rem; font-weight: 700; color: #ffffff; margin: 0; text-align: center; width: 100%;">Pembayaran QRIS</h1>
+            <p style="font-size: 0.85rem; color: var(--accent); margin-top: 4px; font-weight: 500; text-align: center; width: 100%;">
+                {{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }} • {{ $order->customer_name }}
+            </p>
         </div>
-        <h1 style="font-size: 1.3rem; font-weight: 800;">Pembayaran QRIS</h1>
-        <p style="font-size: 0.8rem; color: var(--accent);">{{ $order->table ? 'Meja ' . $order->table->table_number : 'Takeaway' }} • {{ $order->customer_name }}</p>
-    </header>
+    </div>
 
     <div style="padding: 20px 16px;">
         @if(session('success'))

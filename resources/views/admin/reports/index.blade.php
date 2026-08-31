@@ -1,111 +1,179 @@
 @extends('layouts.admin')
 
-@section('title', 'Laporan Penjualan - Admin')
+@section('title', 'Rekap Transaksi & Laporan Keuangan - Admin')
 
 @section('content')
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Laporan Penjualan & Pendapatan</h1>
-            <p style="font-size: 0.9rem; color: var(--text-muted);">Rekapitulasi transaksi dan pendapatan berdasarkan rentang tanggal</p>
+<div class="space-y-6 font-sans text-stone-800 antialiased">
+
+    <!-- 1. Header Row -->
+    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-2xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-stone-900 text-amber-400 flex items-center justify-center shrink-0 shadow-xs">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-stone-900">Rekap Transaksi & Laporan Keuangan</h1>
+                <p class="text-xs text-stone-500 font-medium mt-0.5">
+                    Periode: <span class="font-bold text-stone-800">{{ \Carbon\Carbon::parse($startDate)->format('d M Y') }}</span> s/d <span class="font-bold text-stone-800">{{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</span>
+                </p>
+            </div>
         </div>
-        <div>
-            <a href="{{ route('admin.reports.export', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-accent" style="padding: 10px 20px;">
-                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                <span>Export Excel (.csv)</span>
-            </a>
-        </div>
+
+        <a href="{{ route('admin.reports.export', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-2xs transition-colors self-start md:self-auto">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>Export Excel (.csv)</span>
+        </a>
     </div>
 
-    <!-- Date Filter Form -->
-    <div style="background: #ffffff; padding: 20px 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 24px; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-        <form action="{{ route('admin.reports.index') }}" method="GET" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
-            <div>
-                <label class="form-label" style="margin-bottom: 6px;">Tanggal Mulai</label>
-                <input type="date" name="start_date" class="form-control" value="{{ $startDate }}" style="padding: 10px 14px;">
+    <!-- 2. Filter & Preset Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <!-- Quick Preset Pills -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-xs font-bold text-stone-400 uppercase tracking-wider mr-1">Filter Cepat:</span>
+            <a href="{{ route('admin.reports.index', ['preset' => 'today']) }}" 
+               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === 'today' || ($startDate === now()->toDateString() && $endDate === now()->toDateString() && !request('preset')) ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                Hari Ini
+            </a>
+            <a href="{{ route('admin.reports.index', ['preset' => 'yesterday']) }}" 
+               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === 'yesterday' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                Kemarin
+            </a>
+            <a href="{{ route('admin.reports.index', ['preset' => '7days']) }}" 
+               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === '7days' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                7 Hari Terakhir
+            </a>
+            <a href="{{ route('admin.reports.index', ['preset' => 'month']) }}" 
+               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === 'month' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                Bulan Ini
+            </a>
+        </div>
+
+        <!-- Custom Date Range Form -->
+        <form action="{{ route('admin.reports.index') }}" method="GET" class="flex items-center gap-2.5 flex-wrap w-full lg:w-auto">
+            <div class="flex items-center gap-1.5 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 text-xs">
+                <span class="text-stone-500 font-medium">Dari:</span>
+                <input type="date" name="start_date" value="{{ $startDate }}" class="bg-transparent font-bold text-stone-900 focus:outline-none cursor-pointer">
             </div>
 
-            <div>
-                <label class="form-label" style="margin-bottom: 6px;">Tanggal Selesai</label>
-                <input type="date" name="end_date" class="form-control" value="{{ $endDate }}" style="padding: 10px 14px;">
+            <div class="flex items-center gap-1.5 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 text-xs">
+                <span class="text-stone-500 font-medium">S/D:</span>
+                <input type="date" name="end_date" value="{{ $endDate }}" class="bg-transparent font-bold text-stone-900 focus:outline-none cursor-pointer">
             </div>
 
-            <button type="submit" class="btn btn-primary" style="padding: 11px 22px;">
-                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <span>Tampilkan Laporan</span>
+            <button type="submit" class="px-3.5 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold transition-colors shadow-2xs flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <span>Terapkan</span>
             </button>
         </form>
     </div>
 
-    <!-- Executive Summary Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">TOTAL OMSET (LUNAS)</span>
-                <div class="stat-card-icon" style="background: var(--accent-light); color: var(--primary);">
-                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                </div>
+    <!-- 3. Metric Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Total Omset -->
+        <div class="p-5 rounded-2xl bg-stone-900 text-white border border-stone-800 shadow-2xs relative overflow-hidden flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Total Omset (Lunas)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-stone-800 text-stone-300 border border-stone-700">Lunas</span>
             </div>
-            <div class="stat-val">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</div>
+            <div class="mt-3">
+                <div class="text-2xl font-black tracking-tight text-white">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</div>
+                <p class="text-[11px] text-stone-400 font-medium mt-1">Total pembayaran berhasil diterima</p>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">TOTAL TRANSAKSI</span>
-                <div class="stat-card-icon">
-                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <!-- Card 2: Total Transaksi -->
+        <div class="p-5 rounded-2xl bg-white border border-stone-200 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Total Transaksi</span>
+                <div class="w-7 h-7 rounded-lg bg-stone-100 text-stone-600 flex items-center justify-center font-bold text-xs">
+                    {{ $totalOrders }}
                 </div>
             </div>
-            <div class="stat-val">{{ $totalOrders }} <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">Order</span></div>
+            <div class="mt-3">
+                <div class="text-2xl font-black tracking-tight text-stone-900">{{ number_format($totalOrders) }} <span class="text-sm font-semibold text-stone-500">Order</span></div>
+                <p class="text-[11px] text-stone-500 font-medium mt-1">Rata-rata: <strong class="text-stone-800">Rp{{ number_format($avgOrderValue, 0, ',', '.') }}</strong> / order</p>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span style="font-size: 0.85rem; color: var(--success); font-weight: 700;">PENDAPATAN CASH</span>
-                <div class="stat-card-icon" style="background: var(--success-bg); color: var(--success);">
-                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>
-                </div>
+        <!-- Card 3: Cash Revenue -->
+        <div class="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Pendapatan Tunai (Cash)</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-200">CASH</span>
             </div>
-            <div class="stat-val" style="color: var(--success);">Rp{{ number_format($cashRevenue, 0, ',', '.') }}</div>
+            <div class="mt-3">
+                <div class="text-2xl font-black tracking-tight text-emerald-950">Rp{{ number_format($cashRevenue, 0, ',', '.') }}</div>
+                <p class="text-[11px] text-emerald-800 font-semibold mt-1">
+                    {{ $totalRevenue > 0 ? number_format(($cashRevenue / $totalRevenue) * 100, 1) : 0 }}% dari total omset
+                </p>
+            </div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-card-header">
-                <span style="font-size: 0.85rem; color: var(--info); font-weight: 700;">PENDAPATAN QRIS</span>
-                <div class="stat-card-icon" style="background: var(--info-bg); color: var(--info);">
-                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
-                </div>
+        <!-- Card 4: QRIS Revenue -->
+        <div class="p-5 rounded-2xl bg-sky-50/70 border border-sky-200/80 shadow-2xs flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-800">Pendapatan QRIS Instan</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-900 border border-sky-200">QRIS</span>
             </div>
-            <div class="stat-val" style="color: var(--info);">Rp{{ number_format($qrisRevenue, 0, ',', '.') }}</div>
+            <div class="mt-3">
+                <div class="text-2xl font-black tracking-tight text-sky-950">Rp{{ number_format($qrisRevenue, 0, ',', '.') }}</div>
+                <p class="text-[11px] text-sky-800 font-semibold mt-1">
+                    {{ $totalRevenue > 0 ? number_format(($qrisRevenue / $totalRevenue) * 100, 1) : 0 }}% dari total omset
+                </p>
+            </div>
         </div>
     </div>
 
-    <!-- Product Sales Breakdown -->
-    <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 24px; box-shadow: var(--shadow-sm);">
-        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            <svg class="svg-icon svg-icon-md" style="color: var(--accent);" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-            <span>Rekap Penjualan Per Menu (Periode {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }})</span>
-        </h3>
-        <div class="table-responsive" style="box-shadow: none;">
-            <table class="data-table">
+    <!-- 4. Rekap Penjualan Per Menu -->
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-2xs p-5 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+            <div>
+                <h2 class="text-base font-bold text-stone-900">Top 8 Rekap Penjualan Menu Terlaris</h2>
+                <p class="text-xs text-stone-500">Peringkat 8 porsi terjual terbanyak dan total omset per produk</p>
+            </div>
+            <span class="text-xs font-bold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-lg border border-amber-200">Top {{ $itemReport->count() }} Menu</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
                 <thead>
-                    <tr>
-                        <th>Nama Menu</th>
-                        <th>Kategori</th>
-                        <th>Total Porsi Terjual</th>
-                        <th>Total Nominal Sales</th>
+                    <tr class="bg-stone-50 text-stone-500 font-bold uppercase text-[10px] tracking-wider border-b border-stone-200/70">
+                        <th class="py-3 px-3">Rank / Menu</th>
+                        <th class="py-3 px-3">Kategori</th>
+                        <th class="py-3 px-3 text-center">Porsi Terjual</th>
+                        <th class="py-3 px-3 text-right">Total Sales</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($itemReport as $item)
-                        <tr>
-                            <td style="font-weight: 700; color: var(--text-dark);">{{ $item->product->name ?? 'Menu' }}</td>
-                            <td><span class="badge badge-primary">{{ $item->product->category->name ?? '-' }}</span></td>
-                            <td style="font-weight: 800; color: var(--accent-dark);">{{ $item->total_qty }} porsi</td>
-                            <td style="font-weight: 800; color: var(--primary);">Rp{{ number_format($item->total_amount, 0, ',', '.') }}</td>
+                <tbody class="divide-y divide-stone-100">
+                    @forelse($itemReport as $index => $item)
+                        <tr class="hover:bg-stone-50/60 transition-colors">
+                            <td class="py-3 px-3">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-5 h-5 rounded-full {{ $index === 0 ? 'bg-amber-500 text-white font-black' : 'bg-stone-100 text-stone-600 font-bold' }} text-[10px] flex items-center justify-center shrink-0">
+                                        {{ $index + 1 }}
+                                    </span>
+                                    <span class="font-bold text-stone-900">{{ $item->product->name ?? 'Menu' }}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">
+                                    {{ $item->product->category->name ?? '-' }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-3 text-center font-extrabold text-stone-800">
+                                {{ number_format($item->total_qty) }} porsi
+                            </td>
+                            <td class="py-3 px-3 text-right font-black text-stone-900">
+                                Rp{{ number_format($item->total_amount, 0, ',', '.') }}
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">Belum ada penjualan pada periode ini.</td>
+                            <td colspan="4" class="py-8 text-center text-stone-400 font-medium">Belum ada penjualan menu pada periode ini.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -113,45 +181,182 @@
         </div>
     </div>
 
-    <!-- Detailed Transactions Log -->
-    <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
-        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-            <svg class="svg-icon svg-icon-md" style="color: var(--accent);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-            <span>Log Transaksi Lunas</span>
-        </h3>
-        <div class="table-responsive" style="box-shadow: none;">
-            <table class="data-table">
+    <!-- 5. Main Table: Rekap Log Transaksi Lunas -->
+    <div class="bg-white rounded-2xl border border-stone-200 shadow-2xs p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-100">
+            <div>
+                <h2 class="text-base font-bold text-stone-900">Log Rekap Transaksi Lunas</h2>
+                <p class="text-xs text-stone-500">Daftar semua transaksi berhasil (Menampilkan 10 data per halaman)</p>
+            </div>
+            <div class="text-xs font-medium text-stone-500">
+                Menampilkan <span class="font-bold text-stone-900">{{ $orders->firstItem() ?? 0 }}</span> - <span class="font-bold text-stone-900">{{ $orders->lastItem() ?? 0 }}</span> dari <span class="font-bold text-stone-900">{{ $orders->total() }}</span> Transaksi
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
                 <thead>
-                    <tr>
-                        <th>Waktu Order</th>
-                        <th>Order #</th>
-                        <th>Meja</th>
-                        <th>Pelanggan</th>
-                        <th>Metode Bayar</th>
-                        <th>Total Pembayaran</th>
+                    <tr class="bg-stone-50 text-stone-500 font-bold uppercase text-[10px] tracking-wider border-b border-stone-200/70">
+                        <th class="py-3.5 px-3">No. Order / Waktu</th>
+                        <th class="py-3.5 px-3">Pelanggan & Tipe</th>
+                        <th class="py-3.5 px-3">Rincian Menu Pesanan</th>
+                        <th class="py-3.5 px-3">Metode & Status</th>
+                        <th class="py-3.5 px-3 text-right">Total Pembayaran</th>
+                        <th class="py-3.5 px-3 text-center">Detail Struk</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-stone-100">
                     @forelse($orders as $ord)
-                        <tr>
-                            <td style="font-size: 0.85rem; color: var(--text-muted);">{{ $ord->created_at->format('d M Y, H:i') }}</td>
-                            <td style="font-weight: 700; color: var(--primary);">{{ $ord->order_number }}</td>
-                            <td style="font-weight: 700;">Meja {{ $ord->table->table_number }}</td>
-                            <td>{{ $ord->customer_name }}</td>
-                            <td><span class="badge badge-primary">{{ strtoupper($ord->payment_method) }}</span></td>
-                            <td style="font-weight: 800; color: var(--primary);">Rp{{ number_format($ord->total_amount, 0, ',', '.') }}</td>
+                        <tr class="hover:bg-stone-50/80 transition-colors">
+                            <!-- Order & Timestamp -->
+                            <td class="py-3.5 px-3 align-top">
+                                <div class="font-black text-stone-900 text-sm">{{ $ord->order_number }}</div>
+                                <div class="text-[11px] text-stone-500 font-medium mt-0.5">{{ $ord->created_at->format('d/m/Y, H:i') }} WIB</div>
+                            </td>
+
+                            <!-- Pelanggan & Tipe Meja -->
+                            <td class="py-3.5 px-3 align-top space-y-1">
+                                <div class="font-bold text-stone-900">{{ $ord->customer_name }}</div>
+                                <div>
+                                    @if($ord->table)
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-100 text-stone-800 border border-stone-200">
+                                            Meja {{ $ord->table->table_number }}
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                                            Takeaway
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
+
+                            <!-- Items Summary -->
+                            <td class="py-3.5 px-3 align-top">
+                                <div class="bg-stone-50 p-2 rounded-xl border border-stone-200/60 max-w-xs space-y-1">
+                                    @foreach($ord->items as $it)
+                                        <div class="flex items-center justify-between text-[11px] font-semibold text-stone-800">
+                                            <span>{{ $it->quantity }}x {{ $it->product->name ?? 'Menu' }}</span>
+                                            <span class="text-stone-500 text-[10px]">Rp{{ number_format($it->subtotal ?? ($it->price * $it->quantity), 0, ',', '.') }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </td>
+
+                            <!-- Payment Method & Status -->
+                            <td class="py-3.5 px-3 align-top space-y-1">
+                                <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold bg-stone-900 text-white shadow-2xs">
+                                    {{ strtoupper($ord->payment_method) }}
+                                </span>
+                                <div>
+                                    <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-200">
+                                        LUNAS
+                                    </span>
+                                </div>
+                            </td>
+
+                            <!-- Total Amount -->
+                            <td class="py-3.5 px-3 align-top text-right">
+                                <div class="text-base font-black text-stone-900 tracking-tight">Rp{{ number_format($ord->total_amount, 0, ',', '.') }}</div>
+                            </td>
+
+                            <!-- Struk Action Modal Trigger -->
+                            <td class="py-3.5 px-3 align-top text-center">
+                                <button type="button" onclick="showReceiptDetail({{ json_encode($ord) }})" class="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold shadow-2xs transition-all flex items-center gap-1 mx-auto">
+                                    <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    <span>Struk</span>
+                                </button>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Tidak ada transaksi lunas pada rentang tanggal ini.</td>
+                            <td colspan="6" class="py-12 text-center text-stone-400 font-medium">
+                                Tidak ada transaksi lunas ditemukan pada rentang tanggal ini.
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <div style="margin-top: 20px;">
-            {{ $orders->links() }}
+        <!-- Custom Pagination Link Bar (Max 10 data per page) -->
+        <div class="pt-3 border-t border-stone-100 flex items-center justify-between">
+            <div class="text-xs text-stone-500 font-medium">
+                Halaman <span class="font-bold text-stone-900">{{ $orders->currentPage() }}</span> dari <span class="font-bold text-stone-900">{{ $orders->lastPage() }}</span>
+            </div>
+            <div>
+                {{ $orders->appends(request()->query())->links() }}
+            </div>
         </div>
     </div>
+
+</div>
+
+<!-- Thermal Receipt Preview Modal for Admin -->
+<div id="adminReceiptModal" class="fixed inset-0 bg-stone-900/75 backdrop-blur-sm z-[999] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border border-stone-100 transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh] my-auto">
+        <div class="flex items-center justify-between pb-3 border-b border-stone-100 shrink-0">
+            <h3 class="text-base font-black text-stone-900">Detail Struk Pembayaran</h3>
+            <button type="button" onclick="closeAdminReceiptModal()" class="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center font-bold text-sm">
+                &times;
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto my-3 pr-1 space-y-2 font-mono text-xs text-stone-900 bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div class="text-center space-y-0.5 pb-2 border-b border-dashed border-stone-300">
+                <div class="font-black text-sm">MEJA KOPI</div>
+                <div class="text-[10px] text-stone-500 font-sans">Rekap Transaksi Lunas</div>
+            </div>
+            <div class="text-[11px] py-1 border-b border-dashed border-stone-300 space-y-1 font-sans">
+                <div class="flex justify-between"><span class="text-stone-500">Order:</span><strong id="admRcpOrder">#0001</strong></div>
+                <div class="flex justify-between"><span class="text-stone-500">Tipe / Meja:</span><strong id="admRcpTable">Meja 01</strong></div>
+                <div class="flex justify-between"><span class="text-stone-500">Pelanggan:</span><strong id="admRcpCustomer">apep</strong></div>
+                <div class="flex justify-between"><span class="text-stone-500">Waktu:</span><strong id="admRcpDate">31/08/2026</strong></div>
+            </div>
+            <div class="py-1 border-b border-dashed border-stone-300 space-y-1 font-sans" id="admRcpItems">
+                <!-- JS populated -->
+            </div>
+            <div class="text-[11px] pt-1 space-y-1 font-sans">
+                <div class="flex justify-between font-black text-xs text-stone-900">
+                    <span>Total Tagihan:</span>
+                    <span id="admRcpTotal">Rp0</span>
+                </div>
+                <div class="flex justify-between text-stone-600">
+                    <span>Metode Pay:</span>
+                    <span id="admRcpMethod" class="font-bold">CASH</span>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" onclick="closeAdminReceiptModal()" class="w-full py-2.5 rounded-xl bg-stone-900 text-white font-bold text-xs hover:bg-stone-800 transition-all">
+            Tutup Preview
+        </button>
+    </div>
+</div>
+
+<script>
+    function showReceiptDetail(order) {
+        document.getElementById('admRcpOrder').innerText = order.order_number;
+        document.getElementById('admRcpTable').innerText = order.table ? 'Meja ' + order.table.table_number : 'Takeaway';
+        document.getElementById('admRcpCustomer').innerText = order.customer_name;
+        document.getElementById('admRcpDate').innerText = order.created_at ? order.created_at.substring(0, 16).replace('T', ' ') : '-';
+        document.getElementById('admRcpTotal').innerText = 'Rp ' + Number(order.total_amount).toLocaleString('id-ID');
+        document.getElementById('admRcpMethod').innerText = (order.payment_method || 'CASH').toUpperCase();
+
+        const itemsContainer = document.getElementById('admRcpItems');
+        itemsContainer.innerHTML = (order.items || []).map(i => `
+            <div class="flex justify-between text-xs py-0.5">
+                <span>${i.quantity}x ${i.product ? i.product.name : 'Menu'}</span>
+                <span class="font-bold">Rp ${(i.subtotal || (i.price * i.quantity)).toLocaleString('id-ID')}</span>
+            </div>
+        `).join('');
+
+        const modal = document.getElementById('adminReceiptModal');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeAdminReceiptModal() {
+        const modal = document.getElementById('adminReceiptModal');
+        modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+</script>
 @endsection

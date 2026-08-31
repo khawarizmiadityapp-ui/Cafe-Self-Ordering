@@ -9,12 +9,18 @@
         <!-- POS Top Header & Search Bar -->
         <div class="pos-header">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-                <div>
-                    <h1 style="font-size: 1.45rem; font-weight: 800; color: var(--text-dark); display: flex; align-items: center; gap: 10px;">
-                        <svg class="svg-icon svg-icon-md" style="color: var(--accent-dark);" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                        <span>Kasir POS Terminal</span>
-                    </h1>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Pilih menu untuk membuat pesanan & pembayaran langsung</p>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div>
+                        <h1 style="font-size: 1.45rem; font-weight: 800; color: var(--text-dark); display: flex; align-items: center; gap: 10px;">
+                            <svg class="svg-icon svg-icon-md" style="color: var(--accent-dark);" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            <span>Kasir POS Terminal</span>
+                        </h1>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Pilih menu untuk membuat pesanan & pembayaran langsung</p>
+                    </div>
+                    <div style="background: #3c2a21; color: #d4a373; font-weight: 800; font-size: 0.8rem; padding: 6px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(60,42,33,0.15);">
+                        <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <span id="posLiveClock">00:00:00 WIB</span>
+                    </div>
                 </div>
 
                 <!-- Search Input Box -->
@@ -1360,17 +1366,42 @@
         }
 
         document.getElementById('receiptModal').classList.add('active');
+
+        // Otomatis langsung cetak struk ke printer thermal yang terdeteksi!
+        setTimeout(() => {
+            printReceiptDirectly();
+        }, 350);
     }
 
-    // Print Receipt via Popup Window
+    // Print Receipt directly via hidden iframe (NO popup window / NO new tab)
     const cashierReceiptBaseUrl = "{{ url('cashier/orders') }}";
     function printReceiptDirectly() {
         if (!lastCreatedOrderId) return;
         const url = `${cashierReceiptBaseUrl}/${lastCreatedOrderId}/receipt?print=1`;
-        const printWindow = window.open(url, '_blank', 'width=450,height=600,top=100,left=100');
-        if (printWindow) {
-            printWindow.focus();
+
+        let iframe = document.getElementById('silentPrintIframe');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'silentPrintIframe';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
         }
+
+        iframe.onload = function() {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            } catch (e) {
+                console.error('Silent print iframe error:', e);
+            }
+        };
+
+        iframe.src = url;
     }
 
     // Reset POS for next customer
@@ -1390,5 +1421,15 @@
         if (!text) return '';
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
+
+    // Live Real-Time Digital Clock Kasir POS
+    function updatePosClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+        const clockEl = document.getElementById('posLiveClock');
+        if (clockEl) clockEl.innerText = timeStr;
+    }
+    setInterval(updatePosClock, 1000);
+    updatePosClock();
 </script>
 @endpush

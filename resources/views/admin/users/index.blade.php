@@ -59,7 +59,7 @@
                         <th>Email</th>
                         <th>Role Hak Akses</th>
                         <th>Dibuat Pada</th>
-                        <th>Aksi</th>
+                        <th style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,16 +79,23 @@
                                 <span class="badge {{ $roleCls }}">{{ strtoupper($usr->role) }}</span>
                             </td>
                             <td style="font-size: 0.85rem; color: var(--text-muted);">{{ $usr->created_at->format('d M Y, H:i') }}</td>
-                            <td>
+                            <td style="text-align: center;">
                                 @if($usr->id !== auth()->id())
-                                    <form action="{{ route('admin.users.destroy', $usr->id) }}" method="POST" onsubmit="return confirm('Hapus akun ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">
-                                            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            <span>Hapus</span>
+                                    <div class="action-dropdown">
+                                        <button type="button" class="btn-dots" onclick="toggleKebabMenu(this, event)" title="Aksi User Staff">
+                                            <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                                         </button>
-                                    </form>
+                                        <div class="action-dropdown-menu">
+                                            <form action="{{ route('admin.users.destroy', $usr->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun staff ini?')" style="margin: 0;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="action-dropdown-item item-danger">
+                                                    <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                    <span>Hapus Akun</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 @else
                                     <span style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">(Akun Anda Saat Ini)</span>
                                 @endif
@@ -101,6 +108,10 @@
                     @endforelse
                 </tbody>
             </table>
+
+            <div style="margin-top: 16px;">
+                {{ $users->links() }}
+            </div>
         </div>
     </div>
 @endsection

@@ -20,11 +20,13 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'order_status',
+        'is_archived',
         'paid_at',
     ];
 
     protected $casts = [
         'total_amount' => 'decimal:2',
+        'is_archived' => 'boolean',
         'paid_at' => 'datetime',
     ];
 

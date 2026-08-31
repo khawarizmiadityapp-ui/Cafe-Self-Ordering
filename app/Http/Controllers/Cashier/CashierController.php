@@ -23,15 +23,19 @@ class CashierController extends Controller
 
         $stats = [
             'order_baru' => Order::where('created_at', '>=', $today)
+                ->where('is_archived', false)
                 ->where('order_status', 'PENDING')
                 ->count(),
             'menunggu_pembayaran' => Order::where('created_at', '>=', $today)
+                ->where('is_archived', false)
                 ->where('payment_status', 'UNPAID')
                 ->count(),
             'diproses' => Order::where('created_at', '>=', $today)
+                ->where('is_archived', false)
                 ->whereIn('order_status', ['WAITING_KITCHEN', 'PROCESSING'])
                 ->count(),
             'selesai' => Order::where('created_at', '>=', $today)
+                ->where('is_archived', false)
                 ->where('order_status', 'COMPLETED')
                 ->count(),
             'total_pendapatan' => Order::where('created_at', '>=', $today)
@@ -39,34 +43,30 @@ class CashierController extends Controller
                 ->sum('total_amount'),
         ];
 
-        $filterStatus = $request->query('status', 'all');
+        // Active unarchived orders for cashier view
+        $orders = Order::with(['table', 'items.product', 'payment'])
+            ->where('is_archived', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        $query = Order::with(['table', 'items.product', 'payment'])
-            ->orderBy('created_at', 'desc');
+        // All paid raw orders today for real turnover calculation
+        $allOrdersToday = Order::with(['table', 'items.product', 'payment'])
+            ->where('created_at', '>=', $today)
+            ->get();
 
-        if ($filterStatus === 'unpaid') {
-            $query->where('payment_status', 'UNPAID');
-        } elseif ($filterStatus === 'paid') {
-            $query->where('payment_status', 'PAID')->where('order_status', 'PENDING');
-        } elseif ($filterStatus === 'processing') {
-            $query->whereIn('order_status', ['WAITING_KITCHEN', 'PROCESSING']);
-        } elseif ($filterStatus === 'completed') {
-            $query->where('order_status', 'COMPLETED');
-        }
-
-        $orders = $query->paginate(15);
-
-        if ($request->wantsJson()) {
+        if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'stats' => $stats,
                 'orders' => $orders,
+                'all_orders' => $allOrdersToday,
             ]);
         }
 
         return view('cashier.dashboard', [
             'stats' => $stats,
             'orders' => $orders,
-            'currentFilter' => $filterStatus,
+            'allOrdersToday' => $allOrdersToday,
+            'currentFilter' => 'all',
         ]);
     }
 
@@ -360,17 +360,21 @@ class CashierController extends Controller
         return back()->with('success', "Pembayaran untuk Order #{$order->order_number} berhasil dikonfirmasi (PAID)!");
     }
 
-    public function sendToKitchen($id)
+    public function sendToKitchen(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-
-        if ($order->payment_status !== 'PAID') {
-            return back()->with('error', 'Pesanan harus LUNAS sebelum dikirim ke Dapur/Barista.');
-        }
 
         $order->update([
             'order_status' => 'WAITING_KITCHEN',
         ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Order #{$order->order_number} berhasil dikirim ke Dapur!",
+                'order' => $order->load(['table', 'items.product', 'payment']),
+            ]);
+        }
 
         return back()->with('success', "Order #{$order->order_number} berhasil dikirim ke Dapur/Barista!");
     }
@@ -385,24 +389,48 @@ class CashierController extends Controller
         return back()->with('success', "Order #{$order->order_number} telah dibatalkan.");
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $order = Order::findOrFail($id);
         $orderNumber = $order->order_number;
-        $order->delete();
+        $order->update(['is_archived' => true]);
 
-        return back()->with('success', "Order #{$orderNumber} berhasil dihapus permanen.");
-    }
-
-    public function clearCompleted()
-    {
-        $count = Order::whereIn('order_status', ['COMPLETED', 'CANCELLED'])->delete();
-
-        if ($count === 0) {
-            return back()->with('info', 'Tidak ada pesanan lama (Selesai/Batal) untuk dibersihkan.');
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Order #{$orderNumber} diselesaikan & dihapus dari daftar aktif.",
+            ]);
         }
 
-        return back()->with('success', "Berhasil menghapus {$count} pesanan lama (Selesai/Batal).");
+        return back()->with('success', "Order #{$orderNumber} diselesaikan & dihapus dari daftar aktif.");
+    }
+
+    public function clearCompleted(Request $request)
+    {
+        $count = Order::where('order_status', 'COMPLETED')
+            ->where('payment_status', 'PAID')
+            ->where('is_archived', false)
+            ->update(['is_archived' => true]);
+
+        if ($count === 0) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada pesanan Selesai & Lunas yang perlu dihapus.',
+                ]);
+            }
+            return back()->with('info', 'Tidak ada pesanan Selesai & Lunas yang perlu dihapus.');
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'count' => $count,
+                'message' => "Berhasil menghapus {$count} pesanan Selesai & Lunas dari daftar aktif.",
+            ]);
+        }
+
+        return back()->with('success', "Berhasil menghapus {$count} pesanan Selesai & Lunas dari daftar aktif.");
     }
 }
 

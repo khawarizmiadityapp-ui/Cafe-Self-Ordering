@@ -50,7 +50,7 @@
                         <th>Nama Kategori</th>
                         <th>Jumlah Produk</th>
                         <th>Status</th>
-                        <th>Aksi</th>
+                        <th style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,15 +69,22 @@
                                     {{ $category->is_active ? 'AKTIF' : 'NON-AKTIF' }}
                                 </span>
                             </td>
-                            <td>
-                                <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                        <span>Hapus</span>
+                            <td style="text-align: center;">
+                                <div class="action-dropdown">
+                                    <button type="button" class="btn-dots" onclick="toggleKebabMenu(this, event)" title="Aksi Kategori">
+                                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                                     </button>
-                                </form>
+                                    <div class="action-dropdown-menu">
+                                        <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori menu ini?')" style="margin: 0;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="action-dropdown-item item-danger">
+                                                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                <span>Hapus Kategori</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -87,6 +94,10 @@
                     @endforelse
                 </tbody>
             </table>
+
+            <div style="margin-top: 16px;">
+                {{ $categories->links() }}
+            </div>
         </div>
     </div>
 @endsection

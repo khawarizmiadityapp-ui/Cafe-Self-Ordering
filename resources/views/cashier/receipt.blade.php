@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <style>
         @page {
-            size: 80mm auto;
-            margin: 0;
+            size: auto;
+            margin: 0mm;
         }
 
         body {
@@ -21,14 +21,15 @@
         }
 
         .receipt-container {
-            width: 320px;
+            width: 300px;
+            max-width: 100%;
             background: #ffffff;
-            padding: 20px 16px;
+            padding: 16px 14px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border-radius: 6px;
-            color: #111;
-            font-size: 12px;
-            line-height: 1.35;
+            color: #000000;
+            font-size: 11.5px;
+            line-height: 1.3;
         }
 
         .receipt-header {
@@ -123,16 +124,26 @@
         }
 
         @media print {
-            body {
-                background: none !important;
+            @page {
+                size: auto;
+                margin: 0mm;
+            }
+
+            html, body {
+                width: 100% !important;
+                margin: 0 !important;
                 padding: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
             }
 
             .receipt-container {
+                width: 100% !important;
+                max-width: 100% !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
-                width: 100% !important;
-                padding: 4mm !important;
+                padding: 3mm 2mm !important;
+                margin: 0 !important;
             }
 
             .no-print-bar {

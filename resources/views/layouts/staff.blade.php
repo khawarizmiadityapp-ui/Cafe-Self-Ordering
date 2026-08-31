@@ -6,6 +6,30 @@
     <title>@yield('title', 'Staff Portal - Cafe Self-Ordering System')</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdfbf7',
+                            100: '#f7f0e6',
+                            200: '#eddcc4',
+                            300: '#dfc29c',
+                            400: '#d1a373',
+                            500: '#c58851',
+                            600: '#b87243',
+                            700: '#995938',
+                            800: '#7c4933',
+                            900: '#653c2c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    @stack('head')
 </head>
 <body>
     <div style="min-height: 100vh; background: var(--bg-main);">
@@ -65,7 +89,7 @@
             </div>
         </header>
 
-        <main style="padding: 32px 36px;">
+        <main style="padding: 28px 36px 40px 36px;">
             @if(session('success'))
                 <div class="alert alert-success">
                     <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
