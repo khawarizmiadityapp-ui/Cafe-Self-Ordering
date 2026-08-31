@@ -361,11 +361,13 @@
 @push('scripts')
 <script>
     // State Store
-    let allRawOrdersData = [];
+    let allRawOrdersData = @json($allOrdersToday ?? []);
     let ordersData = [];
     let archivedOrderIds = new Set();
+    let latestTotalTurnover = Number(@json($stats['total_pendapatan'] ?? 0));
+    let isSyncingPolling = false;
 
-    // Load archived order IDs from localStorage so deletion persists across refresh!
+    // Load archived order IDs from localStorage so deletion persists across refresh
     try {
         const savedArchived = localStorage.getItem('cashier_archived_orders');
         if (savedArchived) {
@@ -390,10 +392,9 @@
     // Helper parser for raw orders from backend DB
     function parseRawOrdersData(rawList) {
         if (!Array.isArray(rawList)) return [];
-        allRawOrdersData = rawList; // Store ALL raw database orders for accurate Omset calculation
 
         return rawList
-            .filter(o => !archivedOrderIds.has(o.id))
+            .filter(o => !o.is_archived && !archivedOrderIds.has(o.id))
             .map(o => ({
                 id: o.id,
                 order_number: o.order_number,
@@ -426,13 +427,26 @@
 
         // Live Poll Sync with Server DB (Every 3 seconds)
         setInterval(() => {
+            if (isSyncingPolling) return;
+            isSyncingPolling = true;
+
             fetch('/cashier/dashboard', { headers: { 'Accept': 'application/json' } })
                 .then(res => res.json())
                 .then(data => {
+                    if (data.stats && data.stats.total_pendapatan !== undefined) {
+                        latestTotalTurnover = Number(data.stats.total_pendapatan);
+                    }
+                    if (Array.isArray(data.all_orders)) {
+                        allRawOrdersData = data.all_orders;
+                    }
                     const rawList = data.orders && data.orders.data ? data.orders.data : (data.orders || []);
                     ordersData = parseRawOrdersData(rawList);
                     renderDashboard();
-                }).catch(() => {});
+                })
+                .catch(() => {})
+                .finally(() => {
+                    isSyncingPolling = false;
+                });
         }, 3000);
     });
 
@@ -451,10 +465,12 @@
         const completedCount = ordersData.filter(o => o.order_status === 'COMPLETED').length;
 
         // Total Turnover calculated from ALL raw database orders today where payment_status === 'PAID'
-        // Ensures Omset DOES NOT DECREASE when completed orders are archived/cleared from active view!
-        const totalTurnover = allRawOrdersData
+        // Ensures Omset DOES NOT DECREASE or drop to 0 when completed orders are archived/cleared from active view!
+        const calculatedTurnover = allRawOrdersData
             .filter(o => o.payment_status === 'PAID')
             .reduce((sum, o) => sum + Number(o.total_amount), 0);
+
+        const finalTurnover = Math.max(latestTotalTurnover, calculatedTurnover);
 
         document.getElementById('badgeCountPending').innerText = pendingCount;
         document.getElementById('statValPending').innerText = pendingCount;
@@ -468,7 +484,7 @@
         document.getElementById('badgeCountCompleted').innerText = completedCount;
         document.getElementById('statValCompleted').innerText = completedCount;
 
-        document.getElementById('statValTurnover').innerText = formatRupiah(totalTurnover);
+        document.getElementById('statValTurnover').innerText = formatRupiah(finalTurnover);
     }
 
     function changePage(page) {
@@ -767,30 +783,33 @@
     }
 
     // Action 1: Hapus satu per satu pesanan selesai & lunas (Simpan di Rekap Transaksi, Hapus dari Tampilan Aktif Kasir)
-    function handleArchiveCompletedOrder(orderId) {
+    async function handleArchiveCompletedOrder(orderId) {
         const order = ordersData.find(o => o.id === orderId);
         if (!order) return;
 
         if (confirm(`Apakah Anda yakin ingin menyelesaikan & menghapus Pesanan ${order.order_number} (${order.customer_name}) dari daftar aktif Selesai?\n(Pesanan tersimpan permanen di Rekap Transaksi & Total Omset Hari Ini tidak berkurang)`)) {
-            fetch(`/cashier/orders/${orderId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            }).catch(() => {});
-
             archivedOrderIds.add(orderId);
             saveArchivedOrderIds();
             ordersData = ordersData.filter(o => o.id !== orderId);
             renderDashboard();
+
+            try {
+                await fetch(`/cashier/orders/${orderId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+            } catch (e) {}
+
             showToast(`Pesanan ${order.order_number} diselesaikan & dihapus dari daftar aktif.`);
         }
     }
 
     // Action 2: HAPUS SEMUA pesanan selesai & lunas (Bulk Clear & Archive in DB)
-    function handleClearAllCompletedAndPaid() {
+    async function handleClearAllCompletedAndPaid() {
         const targetOrders = ordersData.filter(o => 
             o.order_status === 'COMPLETED' && 
             o.payment_status === 'PAID'
@@ -802,19 +821,22 @@
         }
 
         if (confirm(`Apakah Anda yakin ingin menghapus ${targetOrders.length} pesanan Selesai & Lunas dari daftar aktif Selesai?\n(Semua transaksi tetap tersimpan utuh & permanen di Rekap Transaksi)`)) {
-            fetch(`/cashier/orders/clear-completed`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            }).catch(() => {});
-
             targetOrders.forEach(o => archivedOrderIds.add(o.id));
             saveArchivedOrderIds();
             ordersData = ordersData.filter(o => !(o.order_status === 'COMPLETED' && o.payment_status === 'PAID'));
             renderDashboard();
+
+            try {
+                await fetch(`/cashier/orders/clear-completed`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+            } catch (e) {}
+
             showToast(`${targetOrders.length} pesanan Selesai & Lunas berhasil dihapus dari daftar aktif.`);
         }
     }

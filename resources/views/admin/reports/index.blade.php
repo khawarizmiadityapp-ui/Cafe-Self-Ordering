@@ -5,23 +5,23 @@
 @section('content')
 <div class="space-y-6 font-sans text-stone-800 antialiased">
 
-    <!-- 1. Header Row -->
-    <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-2xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <!-- 1. Modern Header Bar -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-stone-900 text-amber-400 flex items-center justify-center shrink-0 shadow-xs">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-stone-900 text-amber-400 flex items-center justify-center shrink-0 shadow-xs">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl font-bold tracking-tight text-stone-900">Rekap Transaksi & Laporan Keuangan</h1>
+                <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-stone-900">Rekap Transaksi & Laporan Keuangan</h1>
                 <p class="text-xs text-stone-500 font-medium mt-0.5">
                     Periode: <span class="font-bold text-stone-800">{{ \Carbon\Carbon::parse($startDate)->format('d M Y') }}</span> s/d <span class="font-bold text-stone-800">{{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}</span>
                 </p>
             </div>
         </div>
 
-        <a href="{{ route('admin.reports.export', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-2xs transition-colors self-start md:self-auto">
+        <a href="{{ route('admin.reports.export', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all w-full sm:w-auto">
             <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -29,100 +29,100 @@
         </a>
     </div>
 
-    <!-- 2. Filter & Preset Bar -->
-    <div class="bg-white p-4 rounded-2xl border border-stone-200 shadow-2xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <!-- 2. Clean Segmented Filter & Custom Date Range Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-stone-200/90 shadow-2xs space-y-3.5">
         <!-- Quick Preset Pills -->
-        <div class="flex items-center gap-1.5 flex-wrap">
-            <span class="text-xs font-bold text-stone-400 uppercase tracking-wider mr-1">Filter Cepat:</span>
-            <a href="{{ route('admin.reports.index', ['preset' => 'today']) }}" 
-               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === 'today' || ($startDate === now()->toDateString() && $endDate === now()->toDateString() && !request('preset')) ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
-                Hari Ini
-            </a>
-            <a href="{{ route('admin.reports.index', ['preset' => 'yesterday']) }}" 
-               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === 'yesterday' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
-                Kemarin
-            </a>
-            <a href="{{ route('admin.reports.index', ['preset' => '7days']) }}" 
-               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === '7days' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
-                7 Hari Terakhir
-            </a>
-            <a href="{{ route('admin.reports.index', ['preset' => 'month']) }}" 
-               class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all {{ request('preset') === 'month' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
-                Bulan Ini
-            </a>
+        <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-stone-100">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-stone-400">Filter Cepat Periode:</span>
+            <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none max-w-full">
+                <a href="{{ route('admin.reports.index', ['preset' => 'today']) }}" 
+                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap {{ request('preset') === 'today' || ($startDate === now()->toDateString() && $endDate === now()->toDateString() && !request('preset')) ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                    Hari Ini
+                </a>
+                <a href="{{ route('admin.reports.index', ['preset' => 'yesterday']) }}" 
+                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap {{ request('preset') === 'yesterday' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                    Kemarin
+                </a>
+                <a href="{{ route('admin.reports.index', ['preset' => '7days']) }}" 
+                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap {{ request('preset') === '7days' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                    7 Hari Terakhir
+                </a>
+                <a href="{{ route('admin.reports.index', ['preset' => 'month']) }}" 
+                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap {{ request('preset') === 'month' ? 'bg-stone-900 text-white shadow-2xs' : 'bg-stone-100 hover:bg-stone-200 text-stone-700' }}">
+                    Bulan Ini
+                </a>
+            </div>
         </div>
 
         <!-- Custom Date Range Form -->
-        <form action="{{ route('admin.reports.index') }}" method="GET" class="flex items-center gap-2.5 flex-wrap w-full lg:w-auto">
-            <div class="flex items-center gap-1.5 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 text-xs">
-                <span class="text-stone-500 font-medium">Dari:</span>
-                <input type="date" name="start_date" value="{{ $startDate }}" class="bg-transparent font-bold text-stone-900 focus:outline-none cursor-pointer">
+        <form action="{{ route('admin.reports.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 items-center">
+            <div class="flex items-center gap-2 bg-stone-50 px-3 py-2 rounded-xl border border-stone-200 text-xs">
+                <span class="text-stone-400 font-medium">Dari:</span>
+                <input type="date" name="start_date" value="{{ $startDate }}" class="bg-transparent font-bold text-stone-900 focus:outline-none cursor-pointer w-full">
             </div>
 
-            <div class="flex items-center gap-1.5 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 text-xs">
-                <span class="text-stone-500 font-medium">S/D:</span>
-                <input type="date" name="end_date" value="{{ $endDate }}" class="bg-transparent font-bold text-stone-900 focus:outline-none cursor-pointer">
+            <div class="flex items-center gap-2 bg-stone-50 px-3 py-2 rounded-xl border border-stone-200 text-xs">
+                <span class="text-stone-400 font-medium">S/D:</span>
+                <input type="date" name="end_date" value="{{ $endDate }}" class="bg-transparent font-bold text-stone-900 focus:outline-none cursor-pointer w-full">
             </div>
 
-            <button type="submit" class="px-3.5 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold transition-colors shadow-2xs flex items-center gap-1">
+            <button type="submit" class="w-full py-2 rounded-xl bg-amber-700 hover:bg-amber-800 active:scale-95 text-white text-xs font-bold transition-all shadow-2xs flex items-center justify-center gap-1.5">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <span>Terapkan</span>
+                <span>Terapkan Filter</span>
             </button>
         </form>
     </div>
 
-    <!-- 3. Metric Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- 3. Metric Summary Cards (2-Columns on Mobile/Tablet for Maximum Neatness) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <!-- Card 1: Total Omset -->
-        <div class="p-5 rounded-2xl bg-stone-900 text-white border border-stone-800 shadow-2xs relative overflow-hidden flex flex-col justify-between">
+        <div class="p-4 sm:p-5 rounded-2xl bg-stone-900 text-white border border-stone-800 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Total Omset (Lunas)</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-stone-800 text-stone-300 border border-stone-700">Lunas</span>
+                <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-amber-400">Total Omset</span>
+                <span class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black bg-stone-800 text-stone-300 border border-stone-700">LUNAS</span>
             </div>
             <div class="mt-3">
-                <div class="text-2xl font-black tracking-tight text-white">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</div>
-                <p class="text-[11px] text-stone-400 font-medium mt-1">Total pembayaran berhasil diterima</p>
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-white">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</div>
+                <p class="text-[10px] sm:text-[11px] text-stone-400 font-medium mt-1 truncate">Pembayaran berhasil</p>
             </div>
         </div>
 
         <!-- Card 2: Total Transaksi -->
-        <div class="p-5 rounded-2xl bg-white border border-stone-200 shadow-2xs flex flex-col justify-between">
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-stone-200/90 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Total Transaksi</span>
-                <div class="w-7 h-7 rounded-lg bg-stone-100 text-stone-600 flex items-center justify-center font-bold text-xs">
-                    {{ $totalOrders }}
-                </div>
+                <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-stone-500">Total Transaksi</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-stone-100 text-stone-800 border border-stone-200">{{ number_format($totalOrders) }}</span>
             </div>
             <div class="mt-3">
-                <div class="text-2xl font-black tracking-tight text-stone-900">{{ number_format($totalOrders) }} <span class="text-sm font-semibold text-stone-500">Order</span></div>
-                <p class="text-[11px] text-stone-500 font-medium mt-1">Rata-rata: <strong class="text-stone-800">Rp{{ number_format($avgOrderValue, 0, ',', '.') }}</strong> / order</p>
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-stone-900">{{ number_format($totalOrders) }} <span class="text-xs sm:text-sm font-bold text-stone-400">Order</span></div>
+                <p class="text-[10px] sm:text-[11px] text-stone-500 font-medium mt-1 truncate">Rata-rata: <strong class="text-stone-800">Rp{{ number_format($avgOrderValue, 0, ',', '.') }}</strong></p>
             </div>
         </div>
 
         <!-- Card 3: Cash Revenue -->
-        <div class="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 shadow-2xs flex flex-col justify-between">
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-stone-200/90 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Pendapatan Tunai (Cash)</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-200">CASH</span>
+                <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-emerald-700">Omset Cash</span>
+                <span class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">TUNAI</span>
             </div>
             <div class="mt-3">
-                <div class="text-2xl font-black tracking-tight text-emerald-950">Rp{{ number_format($cashRevenue, 0, ',', '.') }}</div>
-                <p class="text-[11px] text-emerald-800 font-semibold mt-1">
-                    {{ $totalRevenue > 0 ? number_format(($cashRevenue / $totalRevenue) * 100, 1) : 0 }}% dari total omset
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-emerald-950">Rp{{ number_format($cashRevenue, 0, ',', '.') }}</div>
+                <p class="text-[10px] sm:text-[11px] text-emerald-700 font-bold mt-1">
+                    {{ $totalRevenue > 0 ? number_format(($cashRevenue / $totalRevenue) * 100, 1) : 0 }}% dari omset
                 </p>
             </div>
         </div>
 
         <!-- Card 4: QRIS Revenue -->
-        <div class="p-5 rounded-2xl bg-sky-50/70 border border-sky-200/80 shadow-2xs flex flex-col justify-between">
+        <div class="p-4 sm:p-5 rounded-2xl bg-white border border-stone-200/90 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-800">Pendapatan QRIS Instan</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-900 border border-sky-200">QRIS</span>
+                <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-sky-700">Omset QRIS</span>
+                <span class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-sky-50 text-sky-800 border border-sky-200">QRIS</span>
             </div>
             <div class="mt-3">
-                <div class="text-2xl font-black tracking-tight text-sky-950">Rp{{ number_format($qrisRevenue, 0, ',', '.') }}</div>
-                <p class="text-[11px] text-sky-800 font-semibold mt-1">
-                    {{ $totalRevenue > 0 ? number_format(($qrisRevenue / $totalRevenue) * 100, 1) : 0 }}% dari total omset
+                <div class="text-xl sm:text-2xl font-black tracking-tight text-sky-950">Rp{{ number_format($qrisRevenue, 0, ',', '.') }}</div>
+                <p class="text-[10px] sm:text-[11px] text-sky-700 font-bold mt-1">
+                    {{ $totalRevenue > 0 ? number_format(($qrisRevenue / $totalRevenue) * 100, 1) : 0 }}% dari omset
                 </p>
             </div>
         </div>
@@ -139,7 +139,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="w-full min-w-[550px] text-left text-xs">
                 <thead>
                     <tr class="bg-stone-50 text-stone-500 font-bold uppercase text-[10px] tracking-wider border-b border-stone-200/70">
                         <th class="py-3 px-3">Rank / Menu</th>
@@ -194,7 +194,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
+            <table class="w-full min-w-[680px] text-left text-xs">
                 <thead>
                     <tr class="bg-stone-50 text-stone-500 font-bold uppercase text-[10px] tracking-wider border-b border-stone-200/70">
                         <th class="py-3.5 px-3">No. Order / Waktu</th>
@@ -230,15 +230,31 @@
                                 </div>
                             </td>
 
-                            <!-- Items Summary -->
-                            <td class="py-3.5 px-3 align-top">
-                                <div class="bg-stone-50 p-2 rounded-xl border border-stone-200/60 max-w-xs space-y-1">
-                                    @foreach($ord->items as $it)
-                                        <div class="flex items-center justify-between text-[11px] font-semibold text-stone-800">
-                                            <span>{{ $it->quantity }}x {{ $it->product->name ?? 'Menu' }}</span>
-                                            <span class="text-stone-500 text-[10px]">Rp{{ number_format($it->subtotal ?? ($it->price * $it->quantity), 0, ',', '.') }}</span>
+                            <!-- Items Summary (Compact Sleek Summary) -->
+                            <td class="py-3 px-4 align-middle">
+                                @php
+                                    $itemCount = $ord->items->count();
+                                    $firstItem = $ord->items->first();
+                                    $totalQty = $ord->items->sum('quantity');
+                                @endphp
+                                <div class="bg-stone-50/90 p-2 rounded-lg border border-stone-200/70 max-w-xs space-y-1 group-hover:bg-white transition-colors shadow-2xs">
+                                    @if($firstItem)
+                                        <div class="flex items-center justify-between text-[11px] font-bold text-stone-900">
+                                            <div class="flex items-center gap-1.5 truncate">
+                                                <span class="w-4 h-4 rounded bg-stone-200/80 text-stone-800 text-[10px] font-black flex items-center justify-center shrink-0">{{ $firstItem->quantity }}x</span>
+                                                <span class="truncate font-bold text-stone-900">{{ $firstItem->product->name ?? 'Menu' }}</span>
+                                            </div>
+                                            <span class="text-stone-600 font-extrabold text-[10px] shrink-0 ml-2">Rp{{ number_format($firstItem->subtotal ?? ($firstItem->price * $firstItem->quantity), 0, ',', '.') }}</span>
                                         </div>
-                                    @endforeach
+                                    @endif
+                                    @if($itemCount > 1)
+                                        <div class="pt-1 border-t border-stone-200/60 flex items-center justify-between text-[10px]">
+                                            <span class="font-extrabold text-amber-900 bg-amber-100/90 px-2 py-0.5 rounded-md border border-amber-200/80">
+                                                +{{ $itemCount - 1 }} menu lainnya ({{ $totalQty }} porsi)
+                                            </span>
+                                            <span class="text-[10px] text-stone-400 font-medium italic">Lihat Struk</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </td>
 
@@ -259,11 +275,12 @@
                                 <div class="text-base font-black text-stone-900 tracking-tight">Rp{{ number_format($ord->total_amount, 0, ',', '.') }}</div>
                             </td>
 
-                            <!-- Struk Action Modal Trigger -->
-                            <td class="py-3.5 px-3 align-top text-center">
-                                <button type="button" onclick="showReceiptDetail({{ json_encode($ord) }})" class="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-700 border border-stone-200 text-xs font-bold shadow-2xs transition-all flex items-center gap-1 mx-auto">
-                                    <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                    <span>Struk</span>
+                            <!-- Struk Action Modal Trigger (3-Dots Kebab Icon) -->
+                            <td class="py-3 px-3 align-middle text-center">
+                                <button type="button" onclick="showReceiptDetail({{ json_encode($ord) }})" title="Detail Struk" class="w-8 h-8 rounded-lg bg-stone-100 hover:bg-stone-900 text-stone-600 hover:text-amber-400 border border-stone-200/80 flex items-center justify-center mx-auto transition-all shadow-2xs group-hover:border-stone-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                    </svg>
                                 </button>
                             </td>
                         </tr>

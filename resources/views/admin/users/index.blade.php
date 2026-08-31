@@ -5,12 +5,12 @@
 @section('content')
     <div class="page-header">
         <div>
-            <h1 class="page-title">Kelola Akun Pengguna Staff</h1>
-            <p style="font-size: 0.9rem; color: var(--text-muted);">Kelola hak akses login untuk Admin, Kasir, dan Barista/Dapur</p>
+            <h1 class="page-title">Kelola User Staff</h1>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kelola hak akses login Admin, Kasir, dan Dapur</p>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 340px 1fr; gap: 24px;">
+    <div class="admin-split-grid">
         <!-- Create User Form -->
         <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); height: fit-content; box-shadow: var(--shadow-sm);">
             <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
@@ -51,65 +51,67 @@
         </div>
 
         <!-- Users List Table -->
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nama Staff</th>
-                        <th>Email</th>
-                        <th>Role Hak Akses</th>
-                        <th>Dibuat Pada</th>
-                        <th style="text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($users as $usr)
+        <div style="background: #ffffff; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 16px; box-shadow: var(--shadow-sm); min-width: 0;">
+            <div class="table-responsive" style="border: none; box-shadow: none;">
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <td style="font-weight: 700;">{{ $usr->name }}</td>
-                            <td>{{ $usr->email }}</td>
-                            <td>
-                                @php
-                                    $roleCls = match($usr->role) {
-                                        'admin' => 'badge-danger',
-                                        'kasir' => 'badge-primary',
-                                        'dapur' => 'badge-warning',
-                                        default => 'badge-info',
-                                    };
-                                @endphp
-                                <span class="badge {{ $roleCls }}">{{ strtoupper($usr->role) }}</span>
-                            </td>
-                            <td style="font-size: 0.85rem; color: var(--text-muted);">{{ $usr->created_at->format('d M Y, H:i') }}</td>
-                            <td style="text-align: center;">
-                                @if($usr->id !== auth()->id())
-                                    <div class="action-dropdown">
-                                        <button type="button" class="btn-dots" onclick="toggleKebabMenu(this, event)" title="Aksi User Staff">
-                                            <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-                                        </button>
-                                        <div class="action-dropdown-menu">
-                                            <form action="{{ route('admin.users.destroy', $usr->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun staff ini?')" style="margin: 0;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="action-dropdown-item item-danger">
-                                                    <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                                    <span>Hapus Akun</span>
-                                                </button>
-                                            </form>
+                            <th>Nama Staff</th>
+                            <th>Email</th>
+                            <th>Role Hak Akses</th>
+                            <th>Dibuat Pada</th>
+                            <th style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($users as $usr)
+                            <tr>
+                                <td style="font-weight: 700;">{{ $usr->name }}</td>
+                                <td>{{ $usr->email }}</td>
+                                <td>
+                                    @php
+                                        $roleCls = match($usr->role) {
+                                            'admin' => 'badge-danger',
+                                            'kasir' => 'badge-primary',
+                                            'dapur' => 'badge-warning',
+                                            default => 'badge-info',
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $roleCls }}">{{ strtoupper($usr->role) }}</span>
+                                </td>
+                                <td style="font-size: 0.85rem; color: var(--text-muted);">{{ $usr->created_at->format('d M Y, H:i') }}</td>
+                                <td style="text-align: center;">
+                                    @if($usr->id !== auth()->id())
+                                        <div class="action-dropdown">
+                                            <button type="button" class="btn-dots" onclick="toggleKebabMenu(this, event)" title="Aksi User Staff">
+                                                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                                            </button>
+                                            <div class="action-dropdown-menu">
+                                                <form action="{{ route('admin.users.destroy', $usr->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus akun staff ini?')" style="margin: 0;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="action-dropdown-item item-danger">
+                                                        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                        <span>Hapus Akun</span>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
-                                    </div>
-                                @else
-                                    <span style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">(Akun Anda Saat Ini)</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Belum ada user terdaftar.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                    @else
+                                        <span style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">(Akun Anda Saat Ini)</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Belum ada user terdaftar.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
-            <div style="margin-top: 16px;">
+            <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color);">
                 {{ $users->links() }}
             </div>
         </div>

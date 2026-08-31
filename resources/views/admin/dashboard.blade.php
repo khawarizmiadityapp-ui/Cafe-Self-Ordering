@@ -5,11 +5,11 @@
 @section('content')
     <div class="page-header">
         <div>
-            <h1 class="page-title">Executive Dashboard Admin</h1>
-            <p style="font-size: 0.9rem; color: var(--text-muted);">Ringkasan performa penjualan dan operasional cafe real-time</p>
+            <h1 class="page-title">Executive Dashboard</h1>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Ringkasan performa penjualan & operasional real-time</p>
         </div>
         <div>
-            <span class="badge badge-primary" style="padding: 8px 16px; font-size: 0.85rem;">
+            <span class="badge badge-primary" style="padding: 6px 12px; font-size: 0.78rem; white-space: nowrap;">
                 <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <span>Sistem Aktif</span>
             </span>
@@ -80,7 +80,7 @@
     </div>
 
     <!-- Analytics Dashboard Content -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <div class="admin-split-2col">
         <!-- Top Selling Products -->
         <div style="background: #ffffff; padding: 24px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
@@ -139,7 +139,7 @@
                         @forelse($recentOrders as $ord)
                             <tr>
                                 <td style="font-weight: 700; color: var(--primary);">{{ $ord->order_number }}</td>
-                                <td style="font-weight: 700;">Meja {{ $ord->table->table_number }}</td>
+                                <td style="font-weight: 700;">{{ $ord->table ? 'Meja ' . $ord->table->table_number : 'Takeaway' }}</td>
                                 <td style="font-weight: 800;">Rp{{ number_format($ord->total_amount, 0, ',', '.') }}</td>
                                 <td>
                                     <span class="badge {{ $ord->payment_status === 'PAID' ? 'badge-success' : 'badge-warning' }}">

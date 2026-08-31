@@ -9,12 +9,12 @@
             @if ($paginator->onFirstPage())
                 <span class="pagination-btn disabled" aria-disabled="true">
                     <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    <span>Sebelumnya</span>
+                    <span class="pagination-btn-text">Sebelumnya</span>
                 </span>
             @else
                 <a href="{{ $paginator->previousPageUrl() }}" class="pagination-btn" rel="prev">
                     <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    <span>Sebelumnya</span>
+                    <span class="pagination-btn-text">Sebelumnya</span>
                 </a>
             @endif
 
@@ -40,12 +40,12 @@
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}" class="pagination-btn" rel="next">
-                    <span>Berikutnya</span>
+                    <span class="pagination-btn-text">Berikutnya</span>
                     <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </a>
             @else
                 <span class="pagination-btn disabled" aria-disabled="true">
-                    <span>Berikutnya</span>
+                    <span class="pagination-btn-text">Berikutnya</span>
                     <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </span>
             @endif
