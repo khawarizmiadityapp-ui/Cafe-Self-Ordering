@@ -676,7 +676,7 @@
         }
 
         return `
-            <div class="bg-white rounded-2xl border border-stone-200/90 shadow-2xs hover:shadow-xl hover:-translate-y-1 hover:border-amber-500/40 transition-all duration-300 flex flex-col justify-between overflow-hidden group relative backdrop-blur-xs hover:ring-2 hover:ring-amber-500/10">
+            <div class="bg-white rounded-2xl border border-stone-200/90 order-card-hover shadow-2xs hover:shadow-xl hover:-translate-y-1 hover:border-amber-500/40 transition-all duration-300 flex flex-col justify-between overflow-hidden group relative backdrop-blur-xs hover:ring-2 hover:ring-amber-500/10">
                 <!-- Status Top Accent Indicator Line -->
                 <div class="h-1 w-full ${config.accentBar} opacity-80 group-hover:opacity-100 transition-opacity"></div>
 

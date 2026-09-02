@@ -175,18 +175,51 @@
 
         <!-- Main Content View -->
         <main class="staff-content">
-            @if(session('success'))
-                <div class="alert alert-success">
-                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    <span>{{ session('success') }}</span>
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="alert alert-error">
-                    <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                    <span>{{ session('error') }}</span>
-                </div>
-            @endif
+            <!-- Global Top Right Toast Notification Container -->
+            <div class="toast-popup-container">
+                @if(session('success'))
+                    <div class="toast-popup toast-success">
+                        <div class="toast-icon-wrap">
+                            <svg class="checkmark-animated" viewBox="0 0 52 52">
+                                <circle class="checkmark-circle" cx="26" cy="26" r="23" fill="none"/>
+                                <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                            </svg>
+                        </div>
+                        <div class="toast-body">
+                            <div class="toast-title">BERHASIL</div>
+                            <div class="toast-message">{{ session('success') }}</div>
+                        </div>
+                        <button type="button" class="toast-close" onclick="closeFlashToast(this)">✕</button>
+                        <div class="toast-progress-bar"></div>
+                    </div>
+                @endif
+                @if(session('error'))
+                    <div class="toast-popup toast-error">
+                        <div class="toast-icon-wrap">
+                            <svg class="svg-icon" style="color: #ef4444; width: 28px; height: 28px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        </div>
+                        <div class="toast-body">
+                            <div class="toast-title" style="color: #ef4444;">GAGAL / ERROR</div>
+                            <div class="toast-message">{{ session('error') }}</div>
+                        </div>
+                        <button type="button" class="toast-close" onclick="closeFlashToast(this)">✕</button>
+                        <div class="toast-progress-bar" style="background: linear-gradient(90deg, #ef4444, #f87171);"></div>
+                    </div>
+                @endif
+                @if(session('info'))
+                    <div class="toast-popup toast-info">
+                        <div class="toast-icon-wrap">
+                            <svg class="svg-icon" style="color: #3b82f6; width: 28px; height: 28px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </div>
+                        <div class="toast-body">
+                            <div class="toast-title" style="color: #3b82f6;">INFORMASI</div>
+                            <div class="toast-message">{{ session('info') }}</div>
+                        </div>
+                        <button type="button" class="toast-close" onclick="closeFlashToast(this)">✕</button>
+                        <div class="toast-progress-bar" style="background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div>
+                    </div>
+                @endif
+            </div>
 
             @yield('content')
         </main>
@@ -222,6 +255,24 @@
             if (!e.target.closest('.action-dropdown')) {
                 document.querySelectorAll('.action-dropdown.open').forEach(d => d.classList.remove('open'));
             }
+        });
+
+        function closeFlashToast(btn) {
+            const toast = btn.closest('.toast-popup');
+            if (toast) {
+                toast.style.animation = 'toastSlideOutRight 0.4s ease forwards';
+                setTimeout(function() { toast.remove(); }, 400);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const toasts = document.querySelectorAll('.toast-popup');
+                toasts.forEach(function(t) {
+                    t.style.animation = 'toastSlideOutRight 0.4s ease forwards';
+                    setTimeout(function() { t.remove(); }, 400);
+                });
+            }, 4500);
         });
     </script>
     @stack('scripts')

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->decimal('price', 12, 2);
-            $table->string('image')->nullable();
+            $table->text('image')->nullable();
             $table->boolean('is_available')->default(true);
             $table->timestamps();
         });

@@ -27,14 +27,14 @@
     </div>
 
     <!-- Active Orders Grid for Kitchen (Max 4 Columns Across) -->
-    <div id="kitchenGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4.5">
+    <div id="kitchenGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @forelse($orders as $order)
             @php
                 $isProcessing = $order->order_status === 'PROCESSING';
                 $cardBorder = $isProcessing ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-stone-200';
             @endphp
 
-            <div class="bg-white rounded-2xl border {{ $cardBorder }} shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden">
+            <div class="bg-white rounded-2xl border {{ $cardBorder }} order-card-hover flex flex-col justify-between overflow-hidden">
                 <!-- Header Tiket Dapur (Simple Clean Layout) -->
                 <div class="p-4 bg-stone-50/80 border-b border-stone-200/80 space-y-1">
                     <div class="flex items-center justify-between">
