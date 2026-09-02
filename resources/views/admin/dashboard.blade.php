@@ -3,17 +3,15 @@
 @section('title', 'Executive Dashboard Admin')
 
 @section('content')
-    <!-- Dashboard Header Banner -->
-    <div class="dash-hero-header">
-        <div class="dash-hero-title-group">
-            <h1 class="dash-hero-title">Executive Dashboard</h1>
-            <p class="dash-hero-sub">Ringkasan performa penjualan & operasional bisnis kafe real-time</p>
+    <!-- Dashboard Clean Header -->
+    <div class="dash-clean-header">
+        <div>
+            <h1 class="dash-title">Executive Dashboard</h1>
+            <p class="dash-sub">Ringkasan performa penjualan & operasional bisnis kafe real-time</p>
         </div>
-        <div class="dash-hero-actions">
-            <div class="system-status-chip">
-                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <span>Operasional Aktif</span>
-            </div>
+        <div class="dash-status-badge">
+            <span class="status-dot-active"></span>
+            <span>Sistem Aktif</span>
         </div>
     </div>
 
