@@ -6,10 +6,6 @@
     <!-- Dashboard Header Banner -->
     <div class="dash-hero-header">
         <div class="dash-hero-title-group">
-            <div class="dash-hero-badge">
-                <span class="pulse-dot"></span>
-                <span>SYSTEM REAL-TIME MONITORING</span>
-            </div>
             <h1 class="dash-hero-title">Executive Dashboard</h1>
             <p class="dash-hero-sub">Ringkasan performa penjualan & operasional bisnis kafe real-time</p>
         </div>
