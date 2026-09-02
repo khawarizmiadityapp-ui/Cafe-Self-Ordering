@@ -155,9 +155,9 @@
 <body>
     <div class="receipt-container" id="receipt">
         <div class="receipt-header">
-            <div class="receipt-title">CAFE SELF-ORDERING</div>
-            <div class="receipt-subtitle">Jl. Coffee Boulevard No. 88, Jakarta</div>
-            <div class="receipt-subtitle">Telp: 0812-3456-7890</div>
+            <div class="receipt-title">{{ \App\Models\Setting::get('store_name', 'KAFE DIGITAL') }}</div>
+            <div class="receipt-subtitle">{{ \App\Models\Setting::get('store_address', 'Jl. Coffee Boulevard No. 88, Jakarta') }}</div>
+            <div class="receipt-subtitle">Telp: {{ \App\Models\Setting::get('store_phone', '0812-3456-7890') }}</div>
         </div>
 
         <div class="receipt-info-row">
@@ -261,8 +261,10 @@
         </div>
 
         <div class="receipt-footer">
-            <div>Terima Kasih Atas Kunjungan Anda!</div>
-            <div style="font-size: 10px; margin-top: 4px;">WiFi: CafeGuest / Pass: ngopidulu</div>
+            <div>{{ \App\Models\Setting::get('receipt_footer_text', 'Terima Kasih Atas Kunjungan Anda!') }}</div>
+            @if(\App\Models\Setting::get('receipt_wifi_info'))
+                <div style="font-size: 10px; margin-top: 4px;">{{ \App\Models\Setting::get('receipt_wifi_info') }}</div>
+            @endif
             <div style="font-size: 9px; margin-top: 6px; color: #888;">Simpan struk ini sebagai bukti pembayaran yang sah.</div>
         </div>
     </div>

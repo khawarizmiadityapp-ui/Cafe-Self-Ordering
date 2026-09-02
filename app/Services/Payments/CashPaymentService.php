@@ -30,6 +30,7 @@ class CashPaymentService implements PaymentGatewayInterface
             'status' => 'PAID',
             'payload' => array_merge($payment->payload ?? [], [
                 'confirmed_by' => auth()->id() ?? 'kasir',
+                'cashier_name' => auth()->user()?->name ?? 'Kasir',
                 'confirmed_at' => now()->toDateTimeString(),
             ]),
         ]);
