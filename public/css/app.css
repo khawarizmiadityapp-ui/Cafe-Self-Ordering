@@ -258,7 +258,7 @@ a {
     background: var(--sidebar-bg, #1c140e) !important;
     border-right: 1px solid var(--border-dark, #2d1d14) !important;
     color: #ffffff !important;
-    padding: 24px 18px !important;
+    padding: 16px 14px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
@@ -272,22 +272,15 @@ a {
     overflow-y: auto !important;
     overflow-x: hidden !important;
     box-sizing: border-box !important;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(212, 163, 115, 0.3) transparent;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .sidebar::-webkit-scrollbar {
-    width: 5px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background: rgba(212, 163, 115, 0.3);
-    border-radius: 4px;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 .sidebar-nav-body {
@@ -297,8 +290,8 @@ a {
 
 .sidebar-footer {
     border-top: 1px solid var(--border-dark);
-    padding-top: 14px;
-    margin-top: 16px;
+    padding-top: 10px;
+    margin-top: 8px;
     flex-shrink: 0;
     width: 100% !important;
 }
@@ -307,8 +300,8 @@ a {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 10px;
-    padding: 8px 10px;
+    margin-bottom: 8px;
+    padding: 6px 10px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -347,7 +340,7 @@ a {
     font-size: 1.3rem;
     font-weight: 800;
     color: #ffffff;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -380,7 +373,7 @@ a {
 .sidebar-menu li {
     width: 100% !important;
     display: block !important;
-    margin: 0 0 4px 0 !important;
+    margin: 0 0 2px 0 !important;
 }
 
 .sidebar-label {
@@ -389,7 +382,7 @@ a {
     color: #8c7b6e;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin: 20px 0 8px 12px;
+    margin: 12px 0 6px 8px;
     display: block !important;
     width: 100% !important;
 }
@@ -397,12 +390,12 @@ a {
 .sidebar-link {
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
-    padding: 12px 16px !important;
+    gap: 10px !important;
+    padding: 9px 12px !important;
     border-radius: var(--radius-sm) !important;
     color: #bfaea0 !important;
     font-weight: 600 !important;
-    font-size: 0.925rem !important;
+    font-size: 0.9rem !important;
     transition: all 0.2s ease !important;
     width: 100% !important;
     box-sizing: border-box !important;
