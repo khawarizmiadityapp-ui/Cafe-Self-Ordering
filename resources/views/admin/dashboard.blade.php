@@ -77,7 +77,7 @@
             <div class="stat-card-footer text-muted">Katalog aktif</div>
         </div>
 
-        <div class="stat-card">
+        <div class="stat-card stat-card-hero">
             <div class="stat-card-header">
                 <span class="stat-card-title">Total Meja Cafe</span>
                 <div class="stat-card-icon stat-icon-brown">
